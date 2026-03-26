@@ -2,7 +2,7 @@
 -- ------------------------------------------------------------
 
 CREATE TABLE site (
-    idSite INT AUTO_INCREMENT PRIMARY KEY,
+    idSite SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     adresse VARCHAR(255),
     code_postal VARCHAR(10),
@@ -11,26 +11,26 @@ CREATE TABLE site (
 ) ENGINE=InnoDB;
 
 CREATE TABLE local (
-    idLocal INT AUTO_INCREMENT PRIMARY KEY,
+    idLocal SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
-    infoLocal TEXT,
-    idSite INT NOT NULL,
+    infoLocal VARCHAR(255),
+    idSite SMALLINT UNSIGNED NOT NULL,
     photo VARCHAR(255)
 ) ENGINE=InnoDB;
 
 CREATE TABLE rangement (
-    idRangement INT AUTO_INCREMENT PRIMARY KEY,
+    idRangement SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
-    infoRangement TEXT,
-    idLocal INT NOT NULL,
+    infoRangement VARCHAR(128),
+    idLocal SMALLINT UNSIGNED NOT NULL,
     photo VARCHAR(255)
 ) ENGINE=InnoDB;
 
 CREATE TABLE niveau (
-    idNiveau INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    infoNiveau TEXT,
-    idRangement INT NOT NULL,
+    idNiveau SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(25) NOT NULL,
+    infoNiveau VARCHAR(255),
+    idRangement SMALLINT UNSIGNED NOT NULL,
     photo VARCHAR(255)
 ) ENGINE=InnoDB;
 
@@ -38,49 +38,48 @@ CREATE TABLE niveau (
 -- ------------------------------------------------------------
 
 CREATE TABLE categorie (
-    idCategorie INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    infoPlus TEXT
+    idCategorie SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(25) NOT NULL,
+    infoPlus VARCHAR(255),
 ) ENGINE=InnoDB;
 
 CREATE TABLE utilisateur (
-    idUtilisateur INT AUTO_INCREMENT PRIMARY KEY,
-    nomUtilisateur VARCHAR(100) NOT NULL,
-    prenomUtilisateur VARCHAR(100) NOT NULL,
+    idUtilisateur SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nomUtilisateur VARCHAR(25) NOT NULL,
+    prenomUtilisateur VARCHAR(15) NOT NULL,
     role ENUM('admin', 'owner', 'user') NOT NULL,
     login VARCHAR(50) UNIQUE NOT NULL,
-    mdp VARCHAR(255) NOT NULL
+    mdp VARCHAR(30) NOT NULL
 ) ENGINE=InnoDB;
 
 
 CREATE TABLE statut_reference (
-    idStatut INT AUTO_INCREMENT PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL -- ex: 'Disponible', 'Prêté', 'En réparation'
+    idStatut SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    libelle VARCHAR(25) NOT NULL -- ex: 'Disponible', 'Prêté', 'En réparation'
 ) ENGINE=InnoDB;
 
 -- 3. TABLE PRINCIPALE DES OBJETS
 -- ------------------------------------------------------------
 
 CREATE TABLE objet (
-    idObjet INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    infoRangement TEXT, 
+    idObjet SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(25) NOT NULL,
+    infoRangement VARCHAR(255), 
     photo VARCHAR(255),
-    idCategorie INT NOT NULL,
-    idNiveau INT NOT NULL,
-    infoPlus TEXT, 
-    date_acquisition DATE,
-    FK_idUser INT NOT NULL,
-    idStatut INT NOT NULL
+    idCategorie SMALLINT UNSIGNED NOT NULL,
+    idNiveau SMALLINT UNSIGNED NOT NULL,
+    infoPlus VARCHAR(255),
+    FK_idUser SMALLINT UNSIGNED NOT NULL,
+    idStatut SMALLINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB;
 
 -- 4. TABLE ASSOCIATIVE POUR LE PRÊT (Relation N-N) [cite: 27, 28]
 -- ------------------------------------------------------------
 
 CREATE TABLE pret (
-    idPret INT AUTO_INCREMENT PRIMARY KEY,
-    idObjet INT NOT NULL,
-    idEmprunteur INT NOT NULL,
+    idPret SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    idObjet SMALLINT UNSIGNED NOT NULL,
+    idEmprunteur SMALLINT UNSIGNED NOT NULL,
     date_debut DATETIME DEFAULT CURRENT_TIMESTAMP,
     date_retour_prevue DATETIME,
     date_retour_reelle DATETIME
