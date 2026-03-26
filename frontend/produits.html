@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardware Manager | Produits</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand">
+            <i class="bi bi-cpu"></i> HardwarePark
+        </span>
+        <a href="addProduct.html" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Ajouter
+        </a>
+    </div>
+</nav>
+
+<!-- HEADER -->
+<div class="container my-4">
+
+    <h4 class="mb-3">Liste des produits</h4>
+
+    <!-- Recherche -->
+    <div class="row mb-3">
+        <div class="col-md-6 mb-2">
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un produit...">
+        </div>
+        <div class="col-md-3 mb-2">
+            <select id="filterCategory" class="form-select">
+                <option value="">Toutes catégories</option>
+                <option>Réseau</option>
+                <option>Serveur</option>
+                <option>Périphérique</option>
+                <option>Stockage</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- LISTE PRODUITS -->
+    <div id="productList" class="row"></div>
+
+</div>
+
+<script>
+
+// 🔹 Données simulées (à remplacer par API plus tard)
+let products = [
+    { nom: "Switch Cisco 24p", categorie: "Réseau", etat: "disponible" },
+    { nom: "Serveur Dell R720", categorie: "Serveur", etat: "maintenance" },
+    { nom: "Clavier Logitech", categorie: "Périphérique", etat: "disponible" },
+    { nom: "NAS Synology", categorie: "Stockage", etat: "pret" },
+    { nom: "Routeur MikroTik", categorie: "Réseau", etat: "disponible" }
+];
+
+// 🔹 Badge état
+function getBadge(etat) {
+    if (etat === "disponible") return `<span class="badge bg-success">Disponible</span>`;
+    if (etat === "pret") return `<span class="badge bg-warning text-dark">En prêt</span>`;
+    if (etat === "maintenance") return `<span class="badge bg-danger">Maintenance</span>`;
+}
+
+// 🔹 Affichage
+function renderProducts(list) {
+
+    let html = "";
+    let categories = {};
+
+    // Grouper par catégorie
+    list.forEach(p => {
+        if (!categories[p.categorie]) {
+            categories[p.categorie] = [];
+        }
+        categories[p.categorie].push(p);
+    });
+
+    // Générer HTML
+    for (let cat in categories) {
+
+        html += `<h5 class="mt-4">${cat}</h5><div class="row">`;
+
+        categories[cat].forEach(p => {
+            html += `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card product-card p-3 shadow-sm">
+                    <h6>${p.nom}</h6>
+                    <small class="text-muted">${p.categorie}</small>
+                    <div class="mt-2">${getBadge(p.etat)}</div>
+                </div>
+            </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    document.getElementById("productList").innerHTML = html;
+}
+
+// 🔹 Recherche + filtre
+function filterProducts() {
+    let search = document.getElementById("searchInput").value.toLowerCase();
+    let cat = document.getElementById("filterCategory").value;
+
+    let filtered = products.filter(p => {
+        return (
+            p.nom.toLowerCase().includes(search) &&
+            (cat === "" || p.categorie === cat)
+        );
+    });
+
+    renderProducts(filtered);
+}
+
+// 🔹 Events
+document.getElementById("searchInput").addEventListener("input", filterProducts);
+document.getElementById("filterCategory").addEventListener("change", filterProducts);
+
+// Initial
+renderProducts(products);
+
+</script>
+
+</body>
+</html>
