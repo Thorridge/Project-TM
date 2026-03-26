@@ -8,7 +8,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 <link rel="stylesheet" href="style.css">
-
+<script src="script.js"></script>
 </head>
 
 <body>
@@ -29,7 +29,7 @@
                 <!-- Username -->
                 <div class="mb-3">
                     <label class="form-label">Nom d'utilisateur</label>
-                    <input type="text" id="username" class="form-control" placeholder="ex: admin123">
+                    <input type="text" id="username" class="form-control" placeholder="Email ou nom d'utilisateur">
                 </div>
 
                 <!-- Email (optionnel mais pro) -->
@@ -41,13 +41,13 @@
                 <!-- Password -->
                 <div class="mb-3">
                     <label class="form-label">Mot de passe</label>
-                    <input type="password" id="password" class="form-control" placeholder="••••••••">
+                    <input type="password" id="password" class="form-control" placeholder="Inserer votre mot de passe">
                 </div>
 
                 <!-- Confirm Password -->
                 <div class="mb-3">
                     <label class="form-label">Confirmer le mot de passe</label>
-                    <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••">
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirmer votre mot de passe">
                 </div>
 
                 <!-- Bouton -->
@@ -72,36 +72,6 @@
     </div>
 
 </div>
-
-<script>
-
-// Validation frontend (important pour UX)
-document.getElementById("registerForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    let username = document.getElementById("username").value;
-    let pseudo = document.getElementById("pseudo").value;
-    let password = document.getElementById("password").value;
-    let confirmPassword = document.getElementById("confirmPassword").value;
-
-    let message = document.getElementById("message");
-
-    if (!username || !password) {
-        message.innerHTML = "<span class='text-danger'>Champs obligatoires</span>";
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        message.innerHTML = "<span class='text-danger'>Les mots de passe ne correspondent pas</span>";
-        return;
-    }
-
-    message.innerHTML = "<span class='text-success'>Prêt à envoyer (API à connecter)</span>";
-
-    // FUTUR :
-    // fetch('api/register.php', { ... })
-});
-</script>
 
 </body>
 </html>
