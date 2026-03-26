@@ -1,10 +1,16 @@
 <?php
 // process.php
-header('Content-Type: application/json'); // On indique qu'on renvoie du JSON [cite: 40]
-require_once 'connect.php'; // On inclut la connexion à la base de données
+session_start(); // Indispensable pour récupérer les infos de l'utilisateur connecté
+header('Content-Type: application/json');
+require_once 'connect.php'; 
 
-// On récupère l'action demandée par l'AJAX (ex: search, stats, categories)
-$action = $_GET['action'] ?? '';
+// Exemple : Récupérer l'ID de l'utilisateur stocké lors du login
+$idUtilisateurConnecte = $_SESSION['user_id'] ?? null;
+
+if (!$idUtilisateurConnecte) {
+    echo json_encode(['error' => 'Vous devez être connecté']);
+    exit;
+}
 
 switch ($action) {
 
