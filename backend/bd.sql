@@ -47,6 +47,7 @@ CREATE TABLE utilisateur (
     idUtilisateur SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nomUtilisateur VARCHAR(25) NOT NULL,
     prenomUtilisateur VARCHAR(15) NOT NULL,
+    pseudoUtilisateur VARCHAR(20), 
     role ENUM('admin', 'owner', 'user') NOT NULL,
     login VARCHAR(50) UNIQUE NOT NULL,
     mdp VARCHAR(30) NOT NULL
@@ -65,6 +66,7 @@ CREATE TABLE objet (
     idObjet SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(25) NOT NULL,
     infoRangement VARCHAR(255), 
+    statut ENUM('En commande', 'Préparation de la commande', 'En expédition', 'En livraison') DEFAULT 'En commande' NOT NULL, 
     photo VARCHAR(255),
     idCategorie SMALLINT UNSIGNED NOT NULL,
     idNiveau SMALLINT UNSIGNED NOT NULL,
