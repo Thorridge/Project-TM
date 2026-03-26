@@ -16,11 +16,25 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#">Tableau de bord</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Mes Prêts</a></li>
-                    <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="index.html">Connexion</a></li>
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Tableau de bord</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Mes Prêts</a>
+                    </li>
+
+                    <!-- Connexion -->
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light ms-lg-2" href="login.html">
+                            Connexion
+                        </a>
+                    </li>
+
                 </ul>
             </div>
         </div>
@@ -37,7 +51,7 @@
                         <input type="text" id="searchName" class="form-control" placeholder="Nom de l'objet (ex: Switch 24 ports)...">
                         <select id="searchCategory" class="form-select" style="max-width: 150px;">
                             <option value="">Toutes catégories</option>
-                            </select>
+                        </select>
                         <button class="btn btn-primary" type="button" id="btnSearch">
                             <i class="bi bi-search"></i>
                         </button>
@@ -101,7 +115,15 @@
             </div>
 
             <div class="col-lg-8">
-                <h5 class="mb-3">Derniers objets ajoutés / Résultats</h5>
+                
+                <!-- Titre + bouton ajouter -->
+                <h5 class="mb-3 d-flex justify-content-between align-items-center">
+                    Derniers objets ajoutés / Résultats
+                    <a href="addProduct.html" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus"></i> Ajouter
+                    </a>
+                </h5>
+
                 <div id="objectList" class="row">
                     <div class="text-center text-muted py-5">
                         Chargement du matériel en cours...
@@ -120,11 +142,8 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Logique AJAX simplifiée pour respecter la séparation Frontend/Backend
         $(document).ready(function() {
             console.log("Interface prête. En attente des WebServices JSON...");
-            // Exemple d'appel AJAX (Fetch) pour récupérer les objets
-            // fetch('api/objets.php').then(res => res.json()).then(data => render(data));
         });
     </script>
 </body>
