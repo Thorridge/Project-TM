@@ -39,3 +39,32 @@ body {
     box-shadow: none;
     border-color: #0d6efd;
 }
+
+/* Préparation pour les animations d'entrée */
+.card-stats, .list-group-item, #objectList {
+    opacity: 0;
+}
+
+/* Effet de zoom au survol des cartes stats */
+.card-stats {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-stats:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Appliquer une transition sur les conteneurs principaux et les colonnes */
+.container, .row, [class*="col-"] {
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Optionnel : Empêcher le débordement horizontal pendant l'animation */
+body {
+    overflow-x: hidden;
+}
+
+/* Animation douce pour les cartes lors de la redistribution */
+.card {
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}

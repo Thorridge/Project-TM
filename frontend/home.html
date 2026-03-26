@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,45 +9,47 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+
+<body class="d-flex flex-column min-vh-100">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="#"><i class="bi bi-cpu"></i> HardwarePark</a>
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-cpu"></i> HardwarePark</a>
 
-        <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
-            Connecté en tant que : <span id="userPseudo" class="text-white fw-bold">Chargement...</span>
+            <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
+                Connecté en tant que : <span id="userPseudo" class="text-white fw-bold">Chargement...</span>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item d-lg-none">
+                        <span class="nav-link disabled text-info">Utilisateur : <b id="userPseudoMobile">...</b></span>
+                    </li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Tableau de bord</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Mes Prêts</a></li>
+                    <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a></li>
+                </ul>
+            </div>
         </div>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item d-lg-none">
-                    <span class="nav-link disabled text-info">Utilisateur : <b id="userPseudoMobile">...</b></span>
-                </li>
-                <li class="nav-item"><a class="nav-link active" href="#">Tableau de bord</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Mes Prêts</a></li>
-                <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+    </nav>
 
     <header class="hero-section text-center">
         <div class="container">
             <h1 class="display-6">Gestion du Matériel Informatique</h1>
             <p class="lead">Labo de tests & Association</p>
-            
+
             <div class="row justify-content-center mt-4">
                 <div class="col-md-8">
                     <div class="input-group mb-3">
-                        <input type="text" id="searchName" class="form-control" placeholder="Nom de l'objet (ex: Switch 24 ports)...">
+                        <input type="text" id="searchName" class="form-control"
+                            placeholder="Nom de l'objet (ex: Switch 24 ports)...">
                         <select id="searchCategory" class="form-select" style="max-width: 150px;">
                             <option value="">Toutes catégories</option>
-                            </select>
+                        </select>
                         <button class="btn btn-primary" type="button" id="btnSearch">
                             <i class="bi bi-search"></i>
                         </button>
@@ -57,7 +60,7 @@
     </header>
 
     <main class="container my-5">
-        
+
         <div class="row mb-4">
             <div class="col-6 col-md-3">
                 <div class="card card-stats shadow-sm p-3 mb-2">
@@ -93,7 +96,8 @@
                     </div>
                     <div class="list-group list-group-flush" id="treeview">
                         <div class="list-group-item">
-                            <a href="#" class="d-flex justify-content-between align-items-center text-decoration-none text-dark">
+                            <a href="#"
+                                class="d-flex justify-content-between align-items-center text-decoration-none text-dark">
                                 <span><i class="bi bi-building"></i> Siège Asso</span>
                                 <span class="badge bg-secondary rounded-pill">12</span>
                             </a>
@@ -130,20 +134,75 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Logique AJAX simplifiée pour respecter la séparation Frontend/Backend
-        $(document).ready(function() {
+        $(document).ready(function () {
             console.log("Interface prête. En attente des WebServices JSON...");
+            // --- 1. Animation d'entrée progressive (Staggered FadeIn) ---
+            // On fait apparaître les cartes de stats l'une après l'autre
+            $(".card-stats").each(function (index) {
+                $(this).delay(150 * index).animate({
+                    opacity: 1,
+                    top: "0"
+                }, 600);
+            });
+
+            // Apparition du reste du contenu
+            $("#treeview, #objectList").animate({ opacity: 1 }, 1000);
+
+            // --- 2. Animation de la barre de recherche ---
+            $("#searchName").on("focus", function () {
+                $(this).parent().animate({
+                    width: "105%" // Petit effet d'agrandissement
+                }, 200);
+            }).on("blur", function () {
+                $(this).parent().animate({
+                    width: "100%"
+                }, 200);
+            });
+
+            // --- 3. Accordéon fluide pour la Navigation Géographique ---
+            // On cache d'abord les sous-niveaux (si tu en as d'autres)
+            $(".ms-3.mt-2.small").hide();
+
+            // Animation au clic sur un parent dans le treeview
+            $("#treeview .list-group-item").on("click", function (e) {
+                // Empêche le saut de page si c'est un lien
+                // e.preventDefault(); 
+
+                const subMenu = $(this).find(".ms-3");
+                if (subMenu.length > 0) {
+                    subMenu.slideToggle(400, "swing");
+                    // Rotation de l'icône si nécessaire
+                    $(this).find(".bi-building, .bi-house").toggleClass("text-primary");
+                }
+            });
+
+            // --- 4. Animation du bouton de recherche ---
+            $("#btnSearch").on("click", function () {
+                $(this).html('<span class="spinner-border spinner-border-sm"></span>');
+
+                // Simulation d'un chargement
+                setTimeout(() => {
+                    $(this).html('<i class="bi bi-search"></i>');
+                    // Animation de secousse si aucun résultat (exemple)
+                    if ($("#searchName").val() === "") {
+                        $("#searchName").animate({ marginLeft: "-10px" }, 50)
+                            .animate({ marginLeft: "10px" }, 50)
+                            .animate({ marginLeft: "0px" }, 50);
+                    }
+                }, 800);
+            });
             function fetchUserInfo() {
                 $.ajax({
                     url: 'api/get_user_info.php', // URL à adapter selon votre backend
                     method: 'GET',
                     dataType: 'json',
-                    success: function(data) {
-                        if(data.pseudo) {
+                    success: function (data) {
+                        if (data.pseudo) {
                             $('#userPseudo').text(data.pseudo);
                             $('#userPseudoMobile').text(data.pseudo);
                         }
                     },
-                    error: function() {
+                    error: function () {
                         // En cas d'erreur ou si pas de session, on affiche "Invité"
                         $('#userPseudo').text("Invité");
                         $('#userPseudoMobile').text("Invité");
@@ -158,4 +217,5 @@
         });
     </script>
 </body>
+
 </html>
