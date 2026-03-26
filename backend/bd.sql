@@ -5,7 +5,7 @@ CREATE TABLE site (
     idSite SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
     adresse VARCHAR(255),
-    code_postal VARCHAR(10),
+    code_postal CHAR(6),
     localite VARCHAR(100),
     photo VARCHAR(255)
 ) ENGINE=InnoDB;
