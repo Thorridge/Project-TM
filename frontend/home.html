@@ -116,16 +116,71 @@
             <small>&copy; 2026 - Projet Technologies Mobiles - Gestion de Parc Hardware</small>
         </div>
     </footer>
-
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Logique AJAX simplifiée pour respecter la séparation Frontend/Backend
-        $(document).ready(function() {
-            console.log("Interface prête. En attente des WebServices JSON...");
-            // Exemple d'appel AJAX (Fetch) pour récupérer les objets
-            // fetch('api/objets.php').then(res => res.json()).then(data => render(data));
+$(document).ready(function() {
+    // 1. Charger les catégories dans le menu déroulant
+    $.getJSON('process.php?action=load_categories', function(data) {
+        const select = $('#searchCategory');
+        data.forEach(cat => {
+            select.append(`<option value="${cat.idCategorie}">${cat.nom}</option>`);
         });
-    </script>
+    });
+
+    // 2. Charger les statistiques globales
+    function loadStats() {
+        $.getJSON('process.php?action=stats', function(data) {
+            let total = 0;
+            data.forEach(stat => {
+                total += parseInt(stat.total);
+                // On cible les IDs de vos cartes de stats
+                if (stat.libelle === 'Disponible') $('#statDispo').text(stat.total);
+                if (stat.libelle === 'En prêt') $('#statPret').text(stat.total);
+                if (stat.libelle === 'Maintenance') $('#statMaintenance').text(stat.total);
+            });
+            $('#statTotal').text(total);
+        });
+    }
+
+    // 3. Fonction pour afficher la liste des objets
+    function fetchObjects(nom = '', cat = '') {
+        const url = `process.php?action=search&nom=${nom}&cat=${cat}`;
+        $.getJSON(url, function(data) {
+            const list = $('#objectList');
+            list.empty(); // On vide le message de chargement
+
+            if (data.length === 0) {
+                list.append('<div class="text-center text-muted py-5">Aucun objet trouvé.</div>');
+                return;
+            }
+
+            data.forEach(obj => {
+                const badgeClass = obj.idStatut == 1 ? 'bg-success' : (obj.idStatut == 2 ? 'bg-warning' : 'bg-danger');
+                list.append(`
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h6 class="card-title">${obj.nom}</h6>
+                                <p class="small text-muted mb-1">ID: ${obj.idObjet}</p>
+                                <span class="badge ${badgeClass}">${obj.statut_nom}</span>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        });
+    }
+
+    // --- Événements ---
+
+    // Lancer la recherche au clic sur le bouton
+    $('#btnSearch').click(function() {
+        fetchObjects($('#searchName').val(), $('#searchCategory').val());
+    });
+
+    // Chargement initial
+    loadStats();
+    fetchObjects();
+});
+</script>
 </body>
 </html>
