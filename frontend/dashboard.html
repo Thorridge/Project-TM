@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord | HardwarePark</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="home.html"><i class="bi bi-cpu"></i> HardwarePark</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="home.html">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="dashboard.html">Tableau de bord</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Mes Prêts</a></li>
+                    <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-white border-bottom shadow-sm">
+        <div class="container py-2">
+            <ul class="nav nav-pills" id="categoryTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" data-cat="all">Tous les objets</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="#" data-cat="1">Informatique</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-cat="2">Réseau</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-cat="3">Outillage</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <main class="container-fluid my-4 px-lg-5">
+        <div class="row">
+            <aside class="col-lg-3 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <i class="bi bi-diagram-3 me-2"></i> Emplacements
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" id="treeview">
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center cursor-pointer" data-bs-toggle="collapse" data-bs-target="#site1">
+                                    <span><i class="bi bi-building me-2"></i> Site Principal</span>
+                                    <i class="bi bi-chevron-down small"></i>
+                                </div>
+                                <div class="collapse show ms-3 mt-2" id="site1">
+                                    <a href="#" class="list-group-item list-group-item-action border-0 py-1 small" data-local="1">
+                                        <i class="bi bi-door-open me-2"></i> Labo A
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action border-0 py-1 small" data-local="2">
+                                        <i class="bi bi-door-open me-2"></i> Stockage B
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="col-lg-9">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <form class="row g-3" id="searchForm">
+                            <div class="col-md-5">
+                                <label class="form-label small fw-bold">Recherche par nom</label>
+                                <input type="text" id="filterName" class="form-control" placeholder="Ex: Switch Cisco...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Catégorie</label>
+                                <select id="filterCategory" class="form-select">
+                                    <option value="">Toutes les catégories</option>
+                                    </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search me-2"></i> Filtrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" id="objectList">
+                    <div class="col item-card" style="opacity: 0;">
+                        <div class="card h-100 product-card shadow-sm">
+                            <div class="position-relative">
+                                <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Objet">
+                                <span class="badge bg-success position-absolute top-0 end-0 m-2">Disponible</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title h6">Switch Gigabit 24 ports</h5>
+                                <p class="card-text text-muted small mb-2">Catégorie: Réseau</p>
+                                <div class="d-flex align-items-center text-primary small">
+                                    <i class="bi bi-geo-alt me-1"></i> Labo A > Armoire 1
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0 d-grid">
+                                <button class="btn btn-sm btn-outline-primary">Détails / Emprunter</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                <div class="text-center mt-5" id="loader" style="display: none;">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container text-center">
+            <small>&copy; 2026 - Projet Technologies Mobiles - Gestion de Parc Hardware</small>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Animation d'entrée pour les cartes
+            function animateCards() {
+                $(".item-card").each(function (index) {
+                    $(this).delay(100 * index).animate({ opacity: 1 }, 500);
+                });
+            }
+
+            // Simulation de chargement initial
+            animateCards();
+
+            // Gestion de la recherche multifactorielle 
+            $("#searchForm").on("submit", function(e) {
+                e.preventDefault();
+                const filters = {
+                    nom: $("#filterName").val(),
+                    categorie: $("#filterCategory").val()
+                };
+                console.log("Envoi de la requête AJAX avec filtres :", filters);
+                // Ici : appel AJAX vers api/get_objets.php [cite: 40]
+            });
+
+            // Navigation par arborescence 
+            $("[data-local]").on("click", function(e) {
+                e.preventDefault();
+                const localId = $(this).data("local");
+                $(".list-group-item-action").removeClass("active text-white bg-primary");
+                $(this).addClass("active text-white bg-primary");
+                
+                console.log("Filtrage par emplacement ID :", localId);
+                // Appel AJAX pour filtrer par local
+            });
+        });
+    </script>
+</body>
+</html>
