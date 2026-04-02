@@ -1,71 +1,70 @@
 <?php
 // process.php
-session_start(); // Indispensable pour récupérer les infos de l'utilisateur connecté
+session_start();
 header('Content-Type: application/json');
-require_once 'connect.php'; 
+require_once 'connect.php';
 
-// Exemple : Récupérer l'ID de l'utilisateur stocké lors du login
-$idUtilisateurConnecte = $_SESSION['user_id'] ?? null;
-
-if (!$idUtilisateurConnecte) {
-    echo json_encode(['error' => 'Vous devez être connecté']);
-    exit;
-}
+$action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
 
-    // 1. Charger les catégories pour le menu déroulant
-    case 'load_categories':
-        $stmt = $pdo->query("SELECT idCategorie, nom FROM categorie ORDER BY nom");
-        echo json_encode($stmt->fetchAll());
-        break;
+    case 'register':
+        $login = $_POST['login'] ?? '';
+        $pseudo = $_POST['pseudo'] ?? '';
+        $mdp = $_POST['mdp'] ?? '';
 
-    // 2. Recherche multifactorielle d'objets (par nom et catégorie) [cite: 32]
-    case 'search':
-        $nom = "%" . ($_GET['nom'] ?? '') . "%";
-        $cat = $_GET['cat'] ?? '';
-
-        // Construction de la requête de base
-        $sql = "SELECT o.*, s.libelle as statut_nom 
-                FROM objet o 
-                JOIN statut_reference s ON o.idStatut = s.idStatut 
-                WHERE o.nom LIKE :nom";
-        
-        $params = ['nom' => $nom];
-
-        // On ajoute le filtre catégorie si sélectionné
-        if (!empty($cat)) {
-            $sql .= " AND o.idCategorie = :cat";
-            $params['cat'] = $cat;
+        if (empty($login) || empty($mdp)) {
+            echo json_encode(['success' => false, 'error' => 'Veuillez remplir les champs obligatoires.']);
+            exit;
         }
 
+        // Sécurité : hachage du mot de passe
+        $hash = password_hash($mdp, PASSWORD_DEFAULT);
+
+        try {
+            $sql = "INSERT INTO utilisateur (login, pseudoUtilisateur, mdp) VALUES (?, ?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$login, $pseudo, $hash]);
+            echo json_encode(['success' => true]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'error' => 'Ce login est déjà utilisé.']);
+        }
+        break;
+
+    case 'login':
+        $login = $_POST['login'] ?? '';
+        $mdp = $_POST['mdp'] ?? '';
+
+        $sql = "SELECT * FROM utilisateur WHERE login = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
-        echo json_encode($stmt->fetchAll());
+        $stmt->execute([$login]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($mdp, $user['mdp'])) {
+            // On stocke les propriétés en session
+            $_SESSION['user_id'] = $user['idUtilisateur'];
+            $_SESSION['pseudo'] = $user['pseudoUtilisateur'];
+            $_SESSION['role'] = $user['role'];
+
+            echo json_encode([
+                'success' => true,
+                'user' => [
+                    'pseudo' => $user['pseudoUtilisateur'],
+                    'role' => $user['role']
+                ]
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Identifiants incorrects.']);
+        }
         break;
 
-    // 3. Charger l'arborescence (Site > Local) [cite: 33]
-    case 'tree':
-        $sql = "SELECT s.nom as site_nom, l.nom as local_nom, l.idLocal 
-                FROM site s 
-                LEFT JOIN local l ON s.idSite = l.idSite 
-                ORDER BY s.nom, l.nom";
-        $stmt = $pdo->query($sql);
-        echo json_encode($stmt->fetchAll());
-        break;
-
-    // 4. Statistiques rapides pour le dashboard [cite: 17]
-    case 'stats':
-        $sql = "SELECT sr.libelle, COUNT(o.idObjet) as total 
-                FROM statut_reference sr 
-                LEFT JOIN objet o ON sr.idStatut = o.idStatut 
-                GROUP BY sr.idStatut";
-        $stmt = $pdo->query($sql);
-        echo json_encode($stmt->fetchAll());
+    case 'logout':
+        session_destroy();
+        echo json_encode(['success' => true]);
         break;
 
     default:
-        echo json_encode(['error' => 'Action non reconnue']);
+        echo json_encode(['error' => 'Action invalide']);
         break;
 }
 ?>

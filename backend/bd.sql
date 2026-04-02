@@ -43,21 +43,23 @@ CREATE TABLE categorie (
     infoPlus VARCHAR(255),
 ) ENGINE=InnoDB;
 
-CREATE TABLE utilisateur (
+CREATE TABLE IF NOT EXISTS utilisateur (
     idUtilisateur SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nomUtilisateur VARCHAR(25) NOT NULL,
-    prenomUtilisateur VARCHAR(15) NOT NULL,
-    pseudoUtilisateur VARCHAR(20), 
-    role ENUM('admin', 'owner', 'user') NOT NULL,
-    login VARCHAR(50) UNIQUE NOT NULL,
-    mdp VARCHAR(30) NOT NULL
+    nomUtilisateur VARCHAR(100),
+    prenomUtilisateur VARCHAR(100),
+    pseudoUtilisateur VARCHAR(50) UNIQUE,
+    role ENUM('admin', 'user') DEFAULT 'user',
+    login VARCHAR(100) NOT NULL UNIQUE, -- Email ou identifiant
+    mdp VARCHAR(255) NOT NULL            -- Stockera le mot de passe haché
 ) ENGINE=InnoDB;
 
-
-CREATE TABLE statut_reference (
+-- Données de test pour les catégories/statuts si nécessaire pour tes autres pages
+CREATE TABLE IF NOT EXISTS statut_reference (
     idStatut SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    libelle VARCHAR(25) NOT NULL -- ex: 'Disponible', 'Prêté', 'En réparation'
+    libelle VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;
+
+INSERT INTO statut_reference (libelle) VALUES ('Disponible'), ('En maintenance');
 
 -- 3. TABLE PRINCIPALE DES OBJETS
 -- ------------------------------------------------------------
