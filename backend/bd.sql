@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS hardware_db;
+CREATE DATABASE IF NOT EXISTS hardware_db CHARACTER SET utf8mb4;
+USE hardware_db;
+
 -- 1. TABLES DE LA HIÉRARCHIE GÉOGRAPHIQUE
 -- ------------------------------------------------------------
 
