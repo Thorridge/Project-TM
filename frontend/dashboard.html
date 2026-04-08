@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,21 +28,10 @@
         </div>
     </nav>
 
-    <div class="bg-white border-bottom shadow-sm">
-        <div class="container py-2">
-            <ul class="nav nav-pills" id="categoryTabs">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#" data-cat="all">Tous les objets</a>
-                </li>
-                <li class="nav-item"><a class="nav-link" href="#" data-cat="1">Informatique</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" data-cat="2">Réseau</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" data-cat="3">Outillage</a></li>
-            </ul>
-        </div>
-    </div>
-
     <main class="container-fluid my-4 px-lg-5">
         <div class="row">
+
+            <!-- SIDEBAR ARBORESCENCE -->
             <aside class="col-lg-3 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-dark text-white">
@@ -51,27 +39,17 @@
                     </div>
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush" id="treeview">
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center cursor-pointer" data-bs-toggle="collapse" data-bs-target="#site1">
-                                    <span><i class="bi bi-building me-2"></i> Site Principal</span>
-                                    <i class="bi bi-chevron-down small"></i>
-                                </div>
-                                <div class="collapse show ms-3 mt-2" id="site1">
-                                    <a href="#" class="list-group-item list-group-item-action border-0 py-1 small" data-local="1">
-                                        <i class="bi bi-door-open me-2"></i> Labo A
-                                    </a>
-                                    <a href="#" class="list-group-item list-group-item-action border-0 py-1 small" data-local="2">
-                                        <i class="bi bi-door-open me-2"></i> Stockage B
-                                    </a>
-                                </div>
+                            <div class="text-center py-3 text-muted small">
+                                <div class="spinner-border spinner-border-sm"></div> Chargement...
                             </div>
                         </div>
                     </div>
                 </div>
             </aside>
 
+            <!-- CONTENU PRINCIPAL -->
             <section class="col-lg-9">
-                
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="h4 mb-0 text-dark">Inventaire du matériel</h2>
                     <a href="addproduct.html" class="btn btn-primary shadow-sm">
@@ -79,9 +57,10 @@
                     </a>
                 </div>
 
+                <!-- FORMULAIRE RECHERCHE -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
-                        <form class="row g-3" id="searchForm">
+                        <div class="row g-3">
                             <div class="col-md-5">
                                 <label class="form-label small fw-bold">Recherche par nom</label>
                                 <input type="text" id="filterName" class="form-control" placeholder="Ex: Switch Cisco...">
@@ -90,41 +69,25 @@
                                 <label class="form-label small fw-bold">Catégorie</label>
                                 <select id="filterCategory" class="form-select">
                                     <option value="">Toutes les catégories</option>
-                                    </select>
+                                </select>
                             </div>
                             <div class="col-md-3 d-flex align-items-end">
-                                <button type="submit" class="btn btn-outline-primary w-100">
+                                <button id="btnSearch" class="btn btn-outline-primary w-100">
                                     <i class="bi bi-search me-2"></i> Filtrer
                                 </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" id="objectList">
-                    <div class="col item-card" style="opacity: 0;">
-                        <div class="card h-100 product-card shadow-sm">
-                            <div class="position-relative">
-                                <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Objet">
-                                <span class="badge bg-success position-absolute top-0 end-0 m-2">Disponible</span>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title h6">Switch Gigabit 24 ports</h5>
-                                <p class="card-text text-muted small mb-2">Catégorie: Réseau</p>
-                                <div class="d-flex align-items-center text-primary small">
-                                    <i class="bi bi-geo-alt me-1"></i> Labo A > Armoire 1
-                                </div>
-                            </div>
-                            <div class="card-footer bg-transparent border-top-0 d-grid">
-                                <button class="btn btn-sm btn-outline-primary">Détails / Emprunter</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-center mt-5" id="loader" style="display: none;">
-                    <div class="spinner-border text-primary" role="status"></div>
+                <!-- LISTE OBJETS -->
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" id="objectList">
+                    <div class="col text-center py-5 text-muted">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2">Chargement des objets...</p>
+                    </div>
                 </div>
+
             </section>
         </div>
     </main>
@@ -138,31 +101,136 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        $(document).ready(function () {
-            function animateCards() {
-                $(".item-card").each(function (index) {
-                    $(this).delay(100 * index).animate({ opacity: 1 }, 500);
+    $(document).ready(function () {
+
+        // ── 1. Charger les catégories ──────────────────────────────
+        $.ajax({
+            url: '../backend/get_categories.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function (cats) {
+                cats.forEach(function (c) {
+                    $('#filterCategory').append(
+                        `<option value="${c.idCategorie}">${c.nom}</option>`
+                    );
                 });
             }
-
-            animateCards();
-
-            $("#searchForm").on("submit", function(e) {
-                e.preventDefault();
-                const filters = {
-                    nom: $("#filterName").val(),
-                    categorie: $("#filterCategory").val()
-                };
-                console.log("Recherche AJAX lancée :", filters);
-            });
-
-            $("[data-local]").on("click", function(e) {
-                e.preventDefault();
-                $(".list-group-item-action").removeClass("active text-white bg-primary");
-                $(this).addClass("active text-white bg-primary");
-                console.log("Filtrage par local ID :", $(this).data("local"));
-            });
         });
+
+        // ── 2. Charger l'arborescence ──────────────────────────────
+        $.ajax({
+            url: '../backend/get_tree.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function (tree) {
+                let html = '';
+                if (tree.length === 0) {
+                    html = '<p class="text-muted small p-3">Aucun emplacement trouvé.</p>';
+                } else {
+                    tree.forEach(function (site, i) {
+                        html += `
+                        <div class="list-group-item p-2">
+                            <div class="d-flex justify-content-between align-items-center"
+                                 data-bs-toggle="collapse" data-bs-target="#site${i}"
+                                 style="cursor:pointer;">
+                                <span><i class="bi bi-building me-2 text-primary"></i><strong>${site.nom}</strong></span>
+                                <i class="bi bi-chevron-down small"></i>
+                            </div>
+                            <div class="collapse show ms-3 mt-1" id="site${i}">`;
+
+                        site.locaux.forEach(function (local, j) {
+                            html += `
+                                <div>
+                                    <a href="#" class="list-group-item list-group-item-action border-0 py-1 small filter-local"
+                                       data-local="${local.idLocal}">
+                                        <i class="bi bi-door-open me-1"></i> ${local.nom}
+                                    </a>`;
+
+                            if (local.rangements && local.rangements.length > 0) {
+                                local.rangements.forEach(function (r) {
+                                    html += `
+                                        <a href="#" class="list-group-item list-group-item-action border-0 py-1 ms-3 small filter-rangement"
+                                           data-rangement="${r.idRangement}">
+                                            <i class="bi bi-archive me-1"></i> ${r.nom}
+                                        </a>`;
+                                });
+                            }
+                            html += `</div>`;
+                        });
+
+                        html += `</div></div>`;
+                    });
+                }
+                $('#treeview').html(html);
+            }
+        });
+
+        // ── 3. Charger les objets ──────────────────────────────────
+        function loadObjets(nom = '', cat = '') {
+            $('#objectList').html('<div class="col text-center py-5 text-muted"><div class="spinner-border text-primary"></div><p class="mt-2">Chargement...</p></div>');
+
+            $.ajax({
+                url: '../backend/get_objets.php',
+                method: 'GET',
+                data: { nom: nom, cat: cat },
+                dataType: 'json',
+                success: function (objets) {
+                    if (objets.length === 0) {
+                        $('#objectList').html('<div class="col"><p class="text-muted text-center py-4">Aucun objet trouvé.</p></div>');
+                        return;
+                    }
+
+                    let html = '';
+                    objets.forEach(function (o) {
+                        const badgeClass = o.statut === 'Disponible' ? 'bg-success' :
+                                           o.statut === 'Prêté'      ? 'bg-warning text-dark' :
+                                                                        'bg-danger';
+                        html += `
+                        <div class="col">
+                            <div class="card h-100 product-card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title h6 mb-0">${o.nom}</h5>
+                                        <span class="badge ${badgeClass}">${o.statut}</span>
+                                    </div>
+                                    <p class="card-text text-muted small mb-1">
+                                        <i class="bi bi-tag me-1"></i>${o.categorie}
+                                    </p>
+                                    <p class="card-text text-primary small">
+                                        <i class="bi bi-geo-alt me-1"></i>
+                                        ${o.site_nom} › ${o.local_nom} › ${o.rangement_nom} › ${o.niveau_nom}
+                                    </p>
+                                    ${o.infoPlus ? `<p class="card-text small text-muted">${o.infoPlus}</p>` : ''}
+                                </div>
+                                <div class="card-footer bg-transparent border-top-0 d-grid">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i>Détails / Emprunter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    $('#objectList').html(html);
+                },
+                error: function () {
+                    $('#objectList').html('<div class="col"><p class="text-danger text-center py-4">Erreur lors du chargement.</p></div>');
+                }
+            });
+        }
+
+        // Chargement initial
+        loadObjets();
+
+        // ── 4. Bouton recherche ────────────────────────────────────
+        $('#btnSearch').on('click', function () {
+            loadObjets($('#filterName').val(), $('#filterCategory').val());
+        });
+
+        $('#filterName').on('keypress', function (e) {
+            if (e.which === 13) $('#btnSearch').click();
+        });
+
+    });
     </script>
 </body>
 </html>
