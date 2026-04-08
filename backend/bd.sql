@@ -3,8 +3,6 @@ CREATE DATABASE IF NOT EXISTS hardware_db CHARACTER SET utf8mb4;
 USE hardware_db;
 
 -- 1. TABLES DE LA HIÉRARCHIE GÉOGRAPHIQUE
--- ------------------------------------------------------------
-
 CREATE TABLE site (
     idSite SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
@@ -39,51 +37,41 @@ CREATE TABLE niveau (
 ) ENGINE=InnoDB;
 
 -- 2. TABLES UTILISATEURS ET CATÉGORIES
--- ------------------------------------------------------------
-
 CREATE TABLE categorie (
     idCategorie SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(25) NOT NULL,
-    infoPlus VARCHAR(255),
+    infoPlus VARCHAR(255)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS utilisateur (
+CREATE TABLE utilisateur (
     idUtilisateur SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nomUtilisateur VARCHAR(100),
     prenomUtilisateur VARCHAR(100),
-    pseudoUtilisateur VARCHAR(50) UNIQUE,
-    role ENUM('admin', 'user') DEFAULT 'user',
-    login VARCHAR(100) NOT NULL UNIQUE, -- Email ou identifiant
-    mdp VARCHAR(255) NOT NULL            -- Stockera le mot de passe haché
+    role ENUM('admin', 'owner', 'user') DEFAULT 'user', -- [cite: 43, 44, 45]
+    login VARCHAR(100) NOT NULL UNIQUE,
+    mdp VARCHAR(255) NOT NULL            
 ) ENGINE=InnoDB;
 
--- Données de test pour les catégories/statuts si nécessaire pour tes autres pages
-CREATE TABLE IF NOT EXISTS statut_reference (
+CREATE TABLE statut_reference (
     idStatut SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;
 
-INSERT INTO statut_reference (libelle) VALUES ('Disponible'), ('En maintenance');
-
 -- 3. TABLE PRINCIPALE DES OBJETS
--- ------------------------------------------------------------
-
 CREATE TABLE objet (
     idObjet SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(25) NOT NULL,
+    nom VARCHAR(50) NOT NULL,
     infoRangement VARCHAR(255), 
-    statut ENUM('En commande', 'Préparation de la commande', 'En expédition', 'En livraison') DEFAULT 'En commande' NOT NULL, 
     photo VARCHAR(255),
     idCategorie SMALLINT UNSIGNED NOT NULL,
     idNiveau SMALLINT UNSIGNED NOT NULL,
-    infoPlus VARCHAR(255),
+    infoPlus TEXT, -- Pour les specs techniques détaillées [cite: 47]
+    date_acquisition DATE, -- 
     FK_idUser SMALLINT UNSIGNED NOT NULL,
     idStatut SMALLINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB;
 
--- 4. TABLE ASSOCIATIVE POUR LE PRÊT (Relation N-N) [cite: 27, 28]
--- ------------------------------------------------------------
-
+-- 4. TABLE ASSOCIATIVE POUR LE PRÊT (Relation N-N) 
 CREATE TABLE pret (
     idPret SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     idObjet SMALLINT UNSIGNED NOT NULL,
@@ -93,27 +81,15 @@ CREATE TABLE pret (
     date_retour_reelle DATETIME
 ) ENGINE=InnoDB;
 
--- 5. DÉFINITION DES RELATIONS (CLÉS ÉTRANGÈRES) VIA ALTER TABLE
--- ------------------------------------------------------------
-
-
-ALTER TABLE local 
-    ADD CONSTRAINT FK_Local_Site FOREIGN KEY (idSite) REFERENCES site(idSite) ON DELETE CASCADE;
-
-ALTER TABLE rangement 
-    ADD CONSTRAINT FK_Rangement_Local FOREIGN KEY (idLocal) REFERENCES local(idLocal) ON DELETE CASCADE;
-
-ALTER TABLE niveau 
-    ADD CONSTRAINT FK_Niveau_Rangement FOREIGN KEY (idRangement) REFERENCES rangement(idRangement) ON DELETE CASCADE;
-
-
+-- 5. CONTRAINTES
+ALTER TABLE local ADD CONSTRAINT FK_Local_Site FOREIGN KEY (idSite) REFERENCES site(idSite) ON DELETE CASCADE;
+ALTER TABLE rangement ADD CONSTRAINT FK_Rangement_Local FOREIGN KEY (idLocal) REFERENCES local(idLocal) ON DELETE CASCADE;
+ALTER TABLE niveau ADD CONSTRAINT FK_Niveau_Rangement FOREIGN KEY (idRangement) REFERENCES rangement(idRangement) ON DELETE CASCADE;
 ALTER TABLE objet 
     ADD CONSTRAINT FK_Objet_Niveau FOREIGN KEY (idNiveau) REFERENCES niveau(idNiveau),
     ADD CONSTRAINT FK_Objet_Categorie FOREIGN KEY (idCategorie) REFERENCES categorie(idCategorie),
     ADD CONSTRAINT FK_Objet_User FOREIGN KEY (FK_idUser) REFERENCES utilisateur(idUtilisateur),
     ADD CONSTRAINT FK_Objet_Statut FOREIGN KEY (idStatut) REFERENCES statut_reference(idStatut);
-
-
 ALTER TABLE pret 
     ADD CONSTRAINT FK_Pret_Objet FOREIGN KEY (idObjet) REFERENCES objet(idObjet),
     ADD CONSTRAINT FK_Pret_Emprunteur FOREIGN KEY (idEmprunteur) REFERENCES utilisateur(idUtilisateur);
