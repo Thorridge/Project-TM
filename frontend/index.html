@@ -18,14 +18,18 @@
         </div>
         <div class="login-body">
             <div class="mb-3">
-                <label for="username" class="form-label">Nom d'utilisateur</label>
-                <input type="text" id="username" class="form-control" placeholder="Email ou nom d'utilisateur">
+                <label for="username" class="form-label">Login</label>
+                <input type="text" id="username" class="form-control" placeholder="Votre login">
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label" >Mot de passe</label>
-                <input type="password" id="password" class="form-control" placeholder="Inserer votre mot de passe">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" id="password" class="form-control" placeholder="Votre mot de passe">
             </div>
-            <button class="btn btn-primary w-100 mb-2">
+
+            <!-- Message d'erreur -->
+            <div id="loginMessage" class="mb-2 text-center small" style="display:none;"></div>
+
+            <button id="btnLogin" class="btn btn-primary w-100 mb-2">
                 <i class="bi bi-box-arrow-in-right"></i> Se connecter
             </button>
             <div class="text-center">
@@ -35,6 +39,65 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    $('#btnLogin').on('click', function () {
+
+        const login = $('#username').val().trim();
+        const mdp   = $('#password').val().trim();
+        const msg   = $('#loginMessage');
+
+        // Validation côté client
+        if (!login || !mdp) {
+            msg.removeClass('text-success').addClass('text-danger')
+               .text('Veuillez remplir tous les champs.').show();
+            return;
+        }
+
+        // Désactiver le bouton pendant la requête
+        $('#btnLogin').prop('disabled', true)
+                      .html('<span class="spinner-border spinner-border-sm"></span> Connexion...');
+
+        // Appel AJAX vers le backend
+        $.ajax({
+            url: '../backend/login.php',
+            method: 'POST',
+            data: { login: login, mdp: mdp },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    msg.removeClass('text-danger').addClass('text-success')
+                       .text('Connexion réussie ! Redirection...').show();
+                    // Redirection selon le rôle
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 800);
+                } else {
+                    msg.removeClass('text-success').addClass('text-danger')
+                       .text(response.message).show();
+                    $('#btnLogin').prop('disabled', false)
+                                  .html('<i class="bi bi-box-arrow-in-right"></i> Se connecter');
+                }
+            },
+            error: function () {
+                msg.removeClass('text-success').addClass('text-danger')
+                   .text('Erreur serveur. Vérifiez votre connexion.').show();
+                $('#btnLogin').prop('disabled', false)
+                              .html('<i class="bi bi-box-arrow-in-right"></i> Se connecter');
+            }
+        });
+    });
+
+    // Permettre de valider avec la touche Entrée
+    $('#password').on('keypress', function (e) {
+        if (e.which === 13) $('#btnLogin').click();
+    });
+
+});
+</script>
+
 </body>
 </html>

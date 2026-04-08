@@ -11,7 +11,7 @@ if (!$idUtilisateurConnecte) {
     echo json_encode(['error' => 'Vous devez être connecté']);
     exit;
 }
-
+// $action n'est jamais récupérée depuis la requête, ça va planter
 switch ($action) {
 
     // 1. Charger les catégories pour le menu déroulant

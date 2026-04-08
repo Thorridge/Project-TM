@@ -40,7 +40,7 @@ CREATE TABLE niveau (
 CREATE TABLE categorie (
     idCategorie SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(25) NOT NULL,
-    infoPlus VARCHAR(255),
+    infoPlus VARCHAR(255)
 ) ENGINE=InnoDB;
 
 CREATE TABLE utilisateur (
@@ -50,7 +50,7 @@ CREATE TABLE utilisateur (
     pseudoUtilisateur VARCHAR(20), 
     role ENUM('admin', 'owner', 'user') NOT NULL,
     login VARCHAR(50) UNIQUE NOT NULL,
-    mdp VARCHAR(30) NOT NULL
+    mdp VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
 
