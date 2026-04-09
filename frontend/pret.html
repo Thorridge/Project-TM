@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardware Manager | Gestion des prêts</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="style.css">
+
+<style>
+body { background-color: #f8f9fa; }
+.loan-card { border-radius: 12px; }
+</style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<!-- NAVBAR IDENTIQUE -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">
+            <i class="bi bi-cpu"></i> HardwarePark
+        </a>
+
+        <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
+            Connecté en tant que : <span id="userPseudo" class="text-white fw-bold">Chargement...</span>
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item d-lg-none">
+                    <span class="nav-link disabled text-info">
+                        Utilisateur : <b id="userPseudoMobile">...</b>
+                    </span>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="home.html">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Mes Prêts</a></li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENU -->
+<div class="container my-4">
+
+    <h4 class="mb-3">Gestion des prêts</h4>
+
+    <!-- FILTRES -->
+    <div class="row mb-3 align-items-end">
+
+        <div class="col-md-4 mb-2">
+            <input type="text" id="searchUser" class="form-control" placeholder="Rechercher utilisateur...">
+        </div>
+        <div class="col-md-3 mb-2">
+            <select id="filterStatus" class="form-select">
+                <option value="">Tous les états</option>
+                <option value="en_cours">En cours</option>
+                <option value="termine">Terminé</option>
+            </select>
+        </div>
+
+        <!-- Bouton recherche -->
+        <div class="col-md-2 mb-2">
+            <button class="btn btn-primary w-100 h-100 d-flex justify-content-center align-items-center" id="btnSearch">
+                <i class="bi bi-search me-1"></i> Rechercher
+            </button>
+        </div>
+
+        <!-- Bouton ajouter -->
+        <div class="col-md-3 mb-2">
+            <a href="addpret.html" class="btn btn-success w-100 h-100 d-flex justify-content-center align-items-center">
+                <i class="bi bi-plus-lg me-1"></i> Ajouter un prêt
+            </a>
+        </div>
+    </div>
+
+    <!-- LISTE -->
+    <div id="loanList" class="row">
+        <div class="text-center text-muted py-5">
+            Chargement des prêts...
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-dark text-white py-4 mt-auto">
+    <div class="container text-center">
+        <small>&copy; 2026 - Projet Technologies Mobiles - Gestion de Parc Hardware</small>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+// 🔹 Badge statut
+function getStatusBadge(statut) {
+    if (statut === "en_cours") return `<span class="badge bg-warning text-dark">En cours</span>`;
+    if (statut === "termine") return `<span class="badge bg-success">Terminé</span>`;
+}
+
+// 🔹 Render
+function renderLoans(loans) {
+    let html = "";
+
+    loans.forEach(l => {
+        html += `
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card loan-card p-3 shadow-sm">
+                <h6>${l.produit}</h6>
+                <small class="text-muted">Utilisateur : ${l.user}</small><br>
+                <small class="text-muted">Date : ${l.date}</small>
+                <div class="mt-2">${getStatusBadge(l.statut)}</div>
+            </div>
+        </div>
+        `;
+    });
+
+    document.getElementById("loanList").innerHTML = html;
+}
+
+// 🔹 API
+function loadLoans() {
+    fetch("api/loans.php")
+        .then(res => res.json())
+        .then(data => renderLoans(data))
+        .catch(() => {
+            document.getElementById("loanList").innerHTML =
+                "<div class='text-danger text-center'>Erreur de chargement</div>";
+        });
+}
+
+// 🔹 Recherche
+$("#btnSearch").on("click", function () {
+    let user = $("#searchUser").val();
+    let status = $("#filterStatus").val();
+
+    fetch(`api/loans.php?user=${user}&status=${status}`)
+        .then(res => res.json())
+        .then(data => renderLoans(data));
+});
+
+// 🔹 USER INFO (identique à ton autre page)
+function fetchUserInfo() {
+    $.ajax({
+        url: 'api/get_user_info.php',
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            if (data.pseudo) {
+                $('#userPseudo').text(data.pseudo);
+                $('#userPseudoMobile').text(data.pseudo);
+            }
+        },
+        error: function () {
+            $('#userPseudo').text("Invité");
+            $('#userPseudoMobile').text("Invité");
+        }
+    });
+}
+
+// Init
+$(document).ready(function () {
+    fetchUserInfo();
+    loadLoans();
+});
+
+</script>
+
+</body>
+</html>
