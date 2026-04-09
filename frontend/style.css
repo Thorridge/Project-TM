@@ -40,11 +40,12 @@ body {
     border-color: #0d6efd;
 }
 
-/* Préparation pour les animations d'entrée */
-.card-stats, .list-group-item, #objectList {
-    opacity: 0;
+#objectList {
+    opacity: 1 !important;
 }
-
+.card-stats {
+    opacity: 1;
+}
 /* Effet de zoom au survol des cartes stats */
 .card-stats {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -64,10 +65,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Animation douce pour les cartes lors de la redistribution */
-.card {
-    transition: transform 0.4s ease, opacity 0.4s ease;
-}
 
 
 /* addproduct.html */

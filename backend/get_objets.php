@@ -4,12 +4,6 @@ session_start();
 header('Content-Type: application/json');
 require_once 'connect.php';
 
-// Vérifier que l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['error' => 'Non connecté']);
-    exit;
-}
-
 $nom = "%" . ($_GET['nom'] ?? '') . "%";
 $cat = $_GET['cat'] ?? '';
 

@@ -4,11 +4,6 @@ session_start();
 header('Content-Type: application/json');
 require_once 'connect.php';
 
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['error' => 'Non connecté']);
-    exit;
-}
-
 // Récupérer toute l'arborescence Site > Local > Rangement
 $sql = "SELECT 
             s.idSite, s.nom AS site_nom,

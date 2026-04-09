@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
+<style>
+* { opacity: 1 !important; }
+</style>
 
 <body class="d-flex flex-column min-vh-100">
 
@@ -111,9 +114,6 @@
                     top: "0"
                 }, 600);
             });
-
-            // Apparition du reste du contenu
-            $("#treeview, #objectList").animate({ opacity: 1 }, 1000);
 
             // --- 2. Animation de la barre de recherche ---
             $("#searchName").on("focus", function () {
