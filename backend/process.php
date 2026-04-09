@@ -4,8 +4,14 @@ session_start();
 header('Content-Type: application/json');
 require_once 'connect.php';
 
-$action = $_REQUEST['action'] ?? '';
+// Exemple : Récupérer l'ID de l'utilisateur stocké lors du login
+$idUtilisateurConnecte = $_SESSION['user_id'] ?? null;
 
+if (!$idUtilisateurConnecte) {
+    echo json_encode(['error' => 'Vous devez être connecté']);
+    exit;
+}
+// $action n'est jamais récupérée depuis la requête, ça va planter
 switch ($action) {
 
     case 'register':

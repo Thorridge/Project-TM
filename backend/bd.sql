@@ -45,11 +45,12 @@ CREATE TABLE categorie (
 
 CREATE TABLE utilisateur (
     idUtilisateur SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nomUtilisateur VARCHAR(100),
-    prenomUtilisateur VARCHAR(100),
-    role ENUM('admin', 'owner', 'user') DEFAULT 'user', -- [cite: 43, 44, 45]
-    login VARCHAR(100) NOT NULL UNIQUE,
-    mdp VARCHAR(255) NOT NULL            
+    nomUtilisateur VARCHAR(25) NOT NULL,
+    prenomUtilisateur VARCHAR(15) NOT NULL,
+    pseudoUtilisateur VARCHAR(20), 
+    role ENUM('admin', 'owner', 'user') NOT NULL,
+    login VARCHAR(50) UNIQUE NOT NULL,
+    mdp VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE statut_reference (
