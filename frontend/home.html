@@ -33,6 +33,7 @@
                     <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Mes Prêts</a></li>
                     <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a></li>
+                    <!-- <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="/backend/process.php?action=logout">Déconnexion</a></li> -->
                 </ul>
             </div>
         </div>
@@ -160,19 +161,20 @@
             });
             function fetchUserInfo() {
                 $.ajax({
-                    url: 'api/get_user_info.php', // URL à adapter selon votre backend
+                    // Correction du chemin et ajout de l'action
+                    url: '../backend/process.php?action=get_user_info', 
                     method: 'GET',
                     dataType: 'json',
                     success: function (data) {
-                        if (data.pseudo) {
+                        if (data.success && data.pseudo) {
                             $('#userPseudo').text(data.pseudo);
                             $('#userPseudoMobile').text(data.pseudo);
+                        } else {
+                            $('#userPseudo').text("Invité");
                         }
                     },
                     error: function () {
-                        // En cas d'erreur ou si pas de session, on affiche "Invité"
-                        $('#userPseudo').text("Invité");
-                        $('#userPseudoMobile').text("Invité");
+                        $('#userPseudo').text("Non connecté");
                     }
                 });
             }
