@@ -1,5 +1,5 @@
 <?php
-// process.php
+// backend/process.php
 session_start();
 header('Content-Type: application/json');
 require_once 'connect.php';
@@ -13,66 +13,43 @@ if (!$idUtilisateurConnecte) {
 }
 // $action n'est jamais récupérée depuis la requête, ça va planter
 $action = $_REQUEST['action'] ?? '';
+// On récupère l'action à réaliser
+$action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 switch ($action) {
+    case 'get_user_info':
+        // On vérifie si l'utilisateur est connecté en session
+        if (isset($_SESSION['user_id'])) {
+            try {
+                // On interroge la base de données pour avoir les infos fraîches
+                $stmt = $pdo->prepare("SELECT pseudoUtilisateur FROM utilisateur WHERE idUtilisateur = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $user = $stmt->fetch();
 
-    case 'register':
-        $login = $_POST['login'] ?? '';
-        $pseudo = $_POST['pseudo'] ?? '';
-        $mdp = $_POST['mdp'] ?? '';
-
-        if (empty($login) || empty($mdp)) {
-            echo json_encode(['success' => false, 'error' => 'Veuillez remplir les champs obligatoires.']);
-            exit;
-        }
-
-        // Sécurité : hachage du mot de passe
-        $hash = password_hash($mdp, PASSWORD_DEFAULT);
-
-        try {
-            $sql = "INSERT INTO utilisateur (login, pseudoUtilisateur, mdp) VALUES (?, ?, ?)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$login, $pseudo, $hash]);
-            echo json_encode(['success' => true]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'error' => 'Ce login est déjà utilisé.']);
-        }
-        break;
-
-    case 'login':
-        $login = $_POST['login'] ?? '';
-        $mdp = $_POST['mdp'] ?? '';
-
-        $sql = "SELECT * FROM utilisateur WHERE login = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$login]);
-        $user = $stmt->fetch();
-
-        if ($user && password_verify($mdp, $user['mdp'])) {
-            // On stocke les propriétés en session
-            $_SESSION['user_id'] = $user['idUtilisateur'];
-            $_SESSION['pseudo'] = $user['pseudoUtilisateur'];
-            $_SESSION['role'] = $user['role'];
-
-            echo json_encode([
-                'success' => true,
-                'user' => [
-                    'pseudo' => $user['pseudoUtilisateur'],
-                    'role' => $user['role']
-                ]
-            ]);
+                if ($user) {
+                    echo json_encode(['success' => true, 'pseudo' => $user['pseudoUtilisateur']]);
+                } else {
+                    echo json_encode(['success' => false, 'error' => 'Utilisateur introuvable']);
+                }
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
         } else {
-            echo json_encode(['success' => false, 'error' => 'Identifiants incorrects.']);
+            echo json_encode(['success' => false, 'error' => 'Non connecté']);
         }
         break;
 
     case 'logout':
+        // Destruction de la session
+        session_unset();
         session_destroy();
-        echo json_encode(['success' => true]);
+        // Redirection vers la page de connexion
+        header('Location: ../index.html');
+        exit;
         break;
 
     default:
-        echo json_encode(['error' => 'Action invalide']);
+        echo json_encode(['error' => 'Action non reconnue']);
         break;
 }
 ?>
