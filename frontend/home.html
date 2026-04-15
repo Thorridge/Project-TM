@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hardware Manager | Labo de Tests</title>
+    <title>Hardware Manager | Accueil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<style>
-* { opacity: 1 !important; }
-</style>
 
 <body class="d-flex flex-column min-vh-100">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="#"><i class="bi bi-cpu"></i> HardwarePark</a>
+            <a class="navbar-brand" href="home.html"><i class="bi bi-cpu"></i> HardwarePark</a>
 
             <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
-                Connecté en tant que : <span id="userPseudo" class="text-white fw-bold">Chargement...</span>
+                Connecté en tant que : <span id="userNom" class="text-white fw-bold">...</span>
             </div>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -29,9 +25,6 @@
 
             <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item d-lg-none">
-                        <span class="nav-link disabled text-info">Utilisateur : <b id="userPseudoMobile">...</b></span>
-                    </li>
                     <li class="nav-item"><a class="nav-link active" href="home.html">Accueil</a></li>
                     <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Mes Prêts</a></li>
@@ -51,9 +44,8 @@
                     <div class="input-group mb-3">
                         <input type="text" id="searchName" class="form-control"
                             placeholder="Nom de l'objet (ex: Switch 24 ports)...">
-                        <select id="searchCategory" class="form-select" style="max-width: 150px;">
+                        <select id="searchCategory" class="form-select" style="max-width: 170px;">
                             <option value="">Toutes catégories</option>
-                        </select>
                         </select>
                         <button class="btn btn-primary" type="button" id="btnSearch">
                             <i class="bi bi-search"></i>
@@ -66,32 +58,45 @@
 
     <main class="container my-5">
 
+        <!-- STATS -->
         <div class="row mb-4">
             <div class="col-6 col-md-3">
                 <div class="card card-stats shadow-sm p-3 mb-2">
                     <small class="text-muted">Total Objets</small>
-                    <div class="h4 mb-0" id="statTotal">-</div>
+                    <div class="h4 mb-0" id="statTotal">
+                        <div class="spinner-border spinner-border-sm text-primary"></div>
+                    </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="card card-stats shadow-sm p-3 mb-2 border-warning">
                     <small class="text-muted">En Prêt</small>
-                    <div class="h4 mb-0 text-warning" id="statPret">-</div>
+                    <div class="h4 mb-0 text-warning" id="statPret">
+                        <div class="spinner-border spinner-border-sm text-warning"></div>
+                    </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="card card-stats shadow-sm p-3 mb-2 border-danger">
                     <small class="text-muted">Maintenance</small>
-                    <div class="h4 mb-0 text-danger" id="statMaintenance">-</div>
+                    <div class="h4 mb-0 text-danger" id="statMaintenance">
+                        <div class="spinner-border spinner-border-sm text-danger"></div>
+                    </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="card card-stats shadow-sm p-3 mb-2 border-success">
                     <small class="text-muted">Disponibles</small>
-                    <div class="h4 mb-0 text-success" id="statDispo">-</div>
+                    <div class="h4 mb-0 text-success" id="statDispo">
+                        <div class="spinner-border spinner-border-sm text-success"></div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- RÉSULTATS RECHERCHE -->
+        <div id="searchResults" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mt-2" style="display:none !important;"></div>
+
     </main>
 
     <footer class="bg-dark text-white py-4 mt-auto">
@@ -103,86 +108,98 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Logique AJAX simplifiée pour respecter la séparation Frontend/Backend
-        $(document).ready(function () {
-            console.log("Interface prête. En attente des WebServices JSON...");
-            // --- 1. Animation d'entrée progressive (Staggered FadeIn) ---
-            // On fait apparaître les cartes de stats l'une après l'autre
-            $(".card-stats").each(function (index) {
-                $(this).delay(150 * index).animate({
-                    opacity: 1,
-                    top: "0"
-                }, 600);
-            });
+    $(document).ready(function () {
 
-            // --- 2. Animation de la barre de recherche ---
-            $("#searchName").on("focus", function () {
-                $(this).parent().animate({
-                    width: "105%" // Petit effet d'agrandissement
-                }, 200);
-            }).on("blur", function () {
-                $(this).parent().animate({
-                    width: "100%"
-                }, 200);
-            });
+        // ── 1. Charger les stats ───────────────────────────────────
+        $.ajax({
+            url: '../backend/get_stats.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $('#statTotal').text(data.total);
+                $('#statPret').text(data.pret);
+                $('#statMaintenance').text(data.maintenance);
+                $('#statDispo').text(data.disponible);
+            },
+            error: function () {
+                $('#statTotal, #statPret, #statMaintenance, #statDispo').text('-');
+            }
+        });
 
-            // --- 3. Accordéon fluide pour la Navigation Géographique ---
-            // On cache d'abord les sous-niveaux (si tu en as d'autres)
-            $(".ms-3.mt-2.small").hide();
-
-            // Animation au clic sur un parent dans le treeview
-            $("#treeview .list-group-item").on("click", function (e) {
-                // Empêche le saut de page si c'est un lien
-                // e.preventDefault(); 
-
-                const subMenu = $(this).find(".ms-3");
-                if (subMenu.length > 0) {
-                    subMenu.slideToggle(400, "swing");
-                    // Rotation de l'icône si nécessaire
-                    $(this).find(".bi-building, .bi-house").toggleClass("text-primary");
-                }
-            });
-
-            // --- 4. Animation du bouton de recherche ---
-            $("#btnSearch").on("click", function () {
-                $(this).html('<span class="spinner-border spinner-border-sm"></span>');
-
-                // Simulation d'un chargement
-                setTimeout(() => {
-                    $(this).html('<i class="bi bi-search"></i>');
-                    // Animation de secousse si aucun résultat (exemple)
-                    if ($("#searchName").val() === "") {
-                        $("#searchName").animate({ marginLeft: "-10px" }, 50)
-                            .animate({ marginLeft: "10px" }, 50)
-                            .animate({ marginLeft: "0px" }, 50);
-                    }
-                }, 800);
-            });
-            function fetchUserInfo() {
-                $.ajax({
-                    url: 'api/get_user_info.php', // URL à adapter selon votre backend
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data.pseudo) {
-                            $('#userPseudo').text(data.pseudo);
-                            $('#userPseudoMobile').text(data.pseudo);
-                        }
-                    },
-                    error: function () {
-                        // En cas d'erreur ou si pas de session, on affiche "Invité"
-                        $('#userPseudo').text("Invité");
-                        $('#userPseudoMobile').text("Invité");
-                    }
+        // ── 2. Charger les catégories ──────────────────────────────
+        $.ajax({
+            url: '../backend/get_categories.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function (cats) {
+                cats.forEach(function (c) {
+                    $('#searchCategory').append(
+                        `<option value="${c.idCategorie}">${c.nom}</option>`
+                    );
                 });
             }
-
-            // Exécution de la fonction au chargement
-            fetchUserInfo();
-            // Exemple d'appel AJAX (Fetch) pour récupérer les objets
-            // fetch('api/objets.php').then(res => res.json()).then(data => render(data));
         });
+
+        // ── 3. Recherche depuis home ───────────────────────────────
+        function doSearch() {
+            const nom = $('#searchName').val().trim();
+            const cat = $('#searchCategory').val();
+
+            if (!nom && !cat) {
+                $('#searchResults').hide();
+                return;
+            }
+
+            $('#btnSearch').html('<span class="spinner-border spinner-border-sm"></span>');
+
+            $.ajax({
+                url: '../backend/get_objets.php',
+                method: 'GET',
+                data: { nom: nom, cat: cat },
+                dataType: 'json',
+                success: function (objets) {
+                    $('#btnSearch').html('<i class="bi bi-search"></i>');
+
+                    if (objets.length === 0) {
+                        $('#searchResults').html('<div class="col"><p class="text-white text-center">Aucun objet trouvé.</p></div>').show();
+                        return;
+                    }
+
+                    let html = '';
+                    objets.forEach(function (o) {
+                        const badgeClass = o.statut === 'Disponible' ? 'bg-success' :
+                                           o.statut.includes('Prêt') ? 'bg-warning text-dark' :
+                                                                        'bg-danger';
+                        html += `
+                        <div class="col">
+                            <div class="card h-100 product-card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title h6 mb-0">${o.nom}</h5>
+                                        <span class="badge ${badgeClass}">${o.statut}</span>
+                                    </div>
+                                    <p class="card-text text-muted small mb-1">
+                                        <i class="bi bi-tag me-1"></i>${o.categorie}
+                                    </p>
+                                    <p class="card-text text-primary small">
+                                        <i class="bi bi-geo-alt me-1"></i>
+                                        ${o.site_nom} › ${o.local_nom} › ${o.rangement_nom} › ${o.niveau_nom}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    $('#searchResults').html(html).show();
+                }
+            });
+        }
+
+        $('#btnSearch').on('click', doSearch);
+        $('#searchName').on('keypress', function (e) {
+            if (e.which === 13) doSearch();
+        });
+
+    });
     </script>
 </body>
-
 </html>
