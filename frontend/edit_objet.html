@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HardwarePark | Modifier un objet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">
+            <i class="bi bi-cpu"></i> HardwarePark
+        </a>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <div class="card form-card">
+        <div class="form-header">
+            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Modifier un objet</h5>
+        </div>
+        <div class="card-body">
+
+            <div id="message" class="mb-3" style="display:none;"></div>
+
+            <input type="hidden" id="idObjet">
+
+            <div class="mb-3">
+                <label class="form-label">Nom de l'objet <span class="text-danger">*</span></label>
+                <input type="text" id="nom" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+                <select id="idCategorie" class="form-select">
+                    <option value="">Choisir une catégorie</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Emplacement <span class="text-danger">*</span></label>
+                <select id="idNiveau" class="form-select">
+                    <option value="">Choisir un emplacement</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Statut <span class="text-danger">*</span></label>
+                <select id="idStatut" class="form-select">
+                    <option value="">Choisir un statut</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Info rangement</label>
+                <input type="text" id="infoRangement" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea id="infoPlus" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="dashboard.html" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+                <button id="btnEdit" class="btn btn-warning">
+                    <i class="bi bi-save"></i> Enregistrer
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    // Récupérer l'ID depuis l'URL
+    const params = new URLSearchParams(window.location.search);
+    const idObjet = params.get('id');
+
+    if (!idObjet) {
+        window.location.href = 'dashboard.html';
+        return;
+    }
+
+    // Charger catégories, niveaux, statuts en parallèle
+    $.when(
+        $.ajax({ url: '../backend/get_categories.php', dataType: 'json' }),
+        $.ajax({ url: '../backend/get_niveaux.php', dataType: 'json' }),
+        $.ajax({ url: '../backend/get_statuts.php', dataType: 'json' }),
+        $.ajax({ url: '../backend/get_objet.php?id=' + idObjet, dataType: 'json' })
+    ).done(function (cats, niveaux, statuts, objet) {
+
+        // Remplir catégories
+        cats[0].forEach(function (c) {
+            $('#idCategorie').append(`<option value="${c.idCategorie}">${c.nom}</option>`);
+        });
+
+        // Remplir niveaux
+        niveaux[0].forEach(function (n) {
+            $('#idNiveau').append(`<option value="${n.idNiveau}">${n.label}</option>`);
+        });
+
+        // Remplir statuts
+        statuts[0].forEach(function (s) {
+            $('#idStatut').append(`<option value="${s.idStatut}">${s.libelle}</option>`);
+        });
+
+        // Remplir le formulaire avec les données actuelles
+        const o = objet[0];
+        $('#idObjet').val(o.idObjet);
+        $('#nom').val(o.nom);
+        $('#idCategorie').val(o.idCategorie);
+        $('#idNiveau').val(o.idNiveau);
+        $('#idStatut').val(o.idStatut);
+        $('#infoRangement').val(o.infoRangement);
+        $('#infoPlus').val(o.infoPlus);
+    });
+
+    // Enregistrer les modifications
+    $('#btnEdit').on('click', function () {
+        const msg = $('#message');
+
+        const data = {
+            idObjet:       $('#idObjet').val(),
+            nom:           $('#nom').val().trim(),
+            idCategorie:   $('#idCategorie').val(),
+            idNiveau:      $('#idNiveau').val(),
+            idStatut:      $('#idStatut').val(),
+            infoRangement: $('#infoRangement').val().trim(),
+            infoPlus:      $('#infoPlus').val().trim()
+        };
+
+        if (!data.nom || !data.idCategorie || !data.idNiveau || !data.idStatut) {
+            msg.removeClass('alert-success').addClass('alert alert-danger')
+               .text('Veuillez remplir tous les champs obligatoires.').show();
+            return;
+        }
+
+        $('#btnEdit').prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm"></span> Enregistrement...');
+
+        $.ajax({
+            url: '../backend/edit_objet.php',
+            method: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    msg.removeClass('alert-danger').addClass('alert alert-success')
+                       .text('Modifications enregistrées ! Redirection...').show();
+                    setTimeout(() => window.location.href = 'dashboard.html', 1500);
+                } else {
+                    msg.removeClass('alert-success').addClass('alert alert-danger')
+                       .text(response.message).show();
+                    $('#btnEdit').prop('disabled', false)
+                                .html('<i class="bi bi-save"></i> Enregistrer');
+                }
+            },
+            error: function () {
+                msg.removeClass('alert-success').addClass('alert alert-danger')
+                   .text('Erreur serveur.').show();
+                $('#btnEdit').prop('disabled', false)
+                            .html('<i class="bi bi-save"></i> Enregistrer');
+            }
+        });
+    });
+
+});
+</script>
+</body>
+</html>
