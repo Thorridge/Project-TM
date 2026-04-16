@@ -7,7 +7,6 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-<link rel="stylesheet" href="style.css">
 
 <style>
 body { background-color: #f8f9fa; }
@@ -17,7 +16,7 @@ body { background-color: #f8f9fa; }
 
 <body class="d-flex flex-column min-vh-100">
 
-<!-- NAVBAR IDENTIQUE -->
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
         <a class="navbar-brand" href="home.html">
@@ -61,6 +60,7 @@ body { background-color: #f8f9fa; }
         <div class="col-md-4 mb-2">
             <input type="text" id="searchUser" class="form-control" placeholder="Rechercher utilisateur...">
         </div>
+
         <div class="col-md-3 mb-2">
             <select id="filterStatus" class="form-select">
                 <option value="">Tous les états</option>
@@ -69,14 +69,12 @@ body { background-color: #f8f9fa; }
             </select>
         </div>
 
-        <!-- Bouton recherche -->
         <div class="col-md-2 mb-2">
             <button class="btn btn-primary w-100 h-100 d-flex justify-content-center align-items-center" id="btnSearch">
                 <i class="bi bi-search me-1"></i> Rechercher
             </button>
         </div>
 
-        <!-- Bouton ajouter -->
         <div class="col-md-3 mb-2">
             <a href="addpret.html" class="btn btn-success w-100 h-100 d-flex justify-content-center align-items-center">
                 <i class="bi bi-plus-lg me-1"></i> Ajouter un prêt
@@ -109,20 +107,67 @@ body { background-color: #f8f9fa; }
 function getStatusBadge(statut) {
     if (statut === "en_cours") return `<span class="badge bg-warning text-dark">En cours</span>`;
     if (statut === "termine") return `<span class="badge bg-success">Terminé</span>`;
+    return `<span class="badge bg-secondary">Inconnu</span>`;
+}
+
+// 🔹 ACTION retour (fusion du 1er fichier)
+function retourPret(idPret, idObjet) {
+
+    if (!confirm("Confirmer la réception ?")) return;
+
+    fetch("../backend/retour_pret.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idPret: idPret, idObjet: idObjet })
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            loadLoans(); 
+        } else {
+            alert(res.message);
+        }
+    });
 }
 
 // 🔹 Render
 function renderLoans(loans) {
+
     let html = "";
 
     loans.forEach(l => {
+
+        let btn = "";
+
+        if (l.statut === "en_cours") {
+            btn = `
+            <button class="btn btn-sm btn-success mt-2"
+                onclick="retourPret(${l.idPret}, ${l.idObjet})">
+                <i class="bi bi-box-arrow-in-down"></i>
+                Réceptionner
+            </button>`;
+        }
+
         html += `
         <div class="col-md-6 col-lg-4 mb-3">
             <div class="card loan-card p-3 shadow-sm">
+
                 <h6>${l.produit}</h6>
-                <small class="text-muted">Utilisateur : ${l.user}</small><br>
-                <small class="text-muted">Date : ${l.date}</small>
-                <div class="mt-2">${getStatusBadge(l.statut)}</div>
+
+                <small class="text-muted">
+                    Utilisateur : ${l.user}
+                </small><br>
+
+                <small class="text-muted">
+                    Date : ${l.date}
+                </small>
+
+                <div class="mt-2">
+                    ${getStatusBadge(l.statut)}
+                </div>
+
+                ${btn}
+
             </div>
         </div>
         `;
@@ -131,49 +176,34 @@ function renderLoans(loans) {
     document.getElementById("loanList").innerHTML = html;
 }
 
-// 🔹 API
-function loadLoans() {
-    fetch("api/loans.php")
-        .then(res => res.json())
-        .then(data => renderLoans(data))
-        .catch(() => {
-            document.getElementById("loanList").innerHTML =
-                "<div class='text-danger text-center'>Erreur de chargement</div>";
+// 🔹 LOAD
+function loadLoans(params = "") {
+    console.log("Tentative de chargement avec :", params); // Debug 1
+
+    fetch("../backend/get_pret.php" + params)
+        .then(res => {
+            console.log("Statut réponse HTTP:", res.status); // Debug 2
+            return res.json();
+        })
+        .then(data => {
+            console.log("Données reçues du PHP :", data); // Debug 3
+            renderLoans(data);
+        })
+        .catch(err => {
+            console.error("Erreur Fetch :", err);
+            $("#loanList").html("<div class='text-danger text-center'>Erreur de chargement</div>");
         });
 }
 
-// 🔹 Recherche
+// 🔹 SEARCH
 $("#btnSearch").on("click", function () {
     let user = $("#searchUser").val();
     let status = $("#filterStatus").val();
-
-    fetch(`api/loans.php?user=${user}&status=${status}`)
-        .then(res => res.json())
-        .then(data => renderLoans(data));
+    loadLoans(`?user=${user}&status=${status}`);
 });
 
-// 🔹 USER INFO (identique à ton autre page)
-function fetchUserInfo() {
-    $.ajax({
-        url: 'api/get_user_info.php',
-        method: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            if (data.pseudo) {
-                $('#userPseudo').text(data.pseudo);
-                $('#userPseudoMobile').text(data.pseudo);
-            }
-        },
-        error: function () {
-            $('#userPseudo').text("Invité");
-            $('#userPseudoMobile').text("Invité");
-        }
-    });
-}
-
-// Init
+// INIT
 $(document).ready(function () {
-    fetchUserInfo();
     loadLoans();
 });
 
