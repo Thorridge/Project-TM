@@ -16,7 +16,7 @@
             <a class="navbar-brand" href="home.html"><i class="bi bi-cpu"></i> HardwarePark</a>
 
             <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
-                Connecté en tant que : <span id="userNom" class="text-white fw-bold">...</span>
+                Connecté en tant que : <span id="userPseudo" class="text-white fw-bold">...</span>
             </div>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -107,7 +107,7 @@
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <!-- <script>
     $(document).ready(function () {
 
         // ── 1. Charger les stats ───────────────────────────────────
@@ -258,6 +258,86 @@
                     }
                 }, 800);
             });
+            fetchUserInfo(); 
+            function fetchUserInfo() {
+                $.ajax({
+                    url: '../backend/process.php?action=get_user_info', 
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success && data.pseudo) {
+                            // Cible bien l'ID présent dans ton HTML
+                            $('#userPseudo').text(data.pseudo);
+                        } else {
+                            $('#userPseudo').text("Invité");
+                        }
+                    },
+                    error: function () {
+                        $('#userPseudo').text("Non connecté");
+                    }
+                });
+            }
+        });
+    </script> -->
+    <!-- <script>
+        // Logique AJAX simplifiée pour respecter la séparation Frontend/Backend
+        $(document).ready(function () {
+            console.log("Interface prête. En attente des WebServices JSON...");
+            // --- 1. Animation d'entrée progressive (Staggered FadeIn) ---
+            // On fait apparaître les cartes de stats l'une après l'autre
+            $(".card-stats").each(function (index) {
+                $(this).delay(150 * index).animate({
+                    opacity: 1,
+                    top: "0"
+                }, 600);
+            });
+
+            // Apparition du reste du contenu
+            $("#treeview, #objectList").animate({ opacity: 1 }, 1000);
+
+            // --- 2. Animation de la barre de recherche ---
+            $("#searchName").on("focus", function () {
+                $(this).parent().animate({
+                    width: "105%" // Petit effet d'agrandissement
+                }, 200);
+            }).on("blur", function () {
+                $(this).parent().animate({
+                    width: "100%"
+                }, 200);
+            });
+
+            // --- 3. Accordéon fluide pour la Navigation Géographique ---
+            // On cache d'abord les sous-niveaux (si tu en as d'autres)
+            $(".ms-3.mt-2.small").hide();
+
+            // Animation au clic sur un parent dans le treeview
+            $("#treeview .list-group-item").on("click", function (e) {
+                // Empêche le saut de page si c'est un lien
+                // e.preventDefault(); 
+
+                const subMenu = $(this).find(".ms-3");
+                if (subMenu.length > 0) {
+                    subMenu.slideToggle(400, "swing");
+                    // Rotation de l'icône si nécessaire
+                    $(this).find(".bi-building, .bi-house").toggleClass("text-primary");
+                }
+            });
+
+            // --- 4. Animation du bouton de recherche ---
+            $("#btnSearch").on("click", function () {
+                $(this).html('<span class="spinner-border spinner-border-sm"></span>');
+
+                // Simulation d'un chargement
+                setTimeout(() => {
+                    $(this).html('<i class="bi bi-search"></i>');
+                    // Animation de secousse si aucun résultat (exemple)
+                    if ($("#searchName").val() === "") {
+                        $("#searchName").animate({ marginLeft: "-10px" }, 50)
+                            .animate({ marginLeft: "10px" }, 50)
+                            .animate({ marginLeft: "0px" }, 50);
+                    }
+                }, 800);
+            });
             function fetchUserInfo() {
                 $.ajax({
                     // Correction du chemin et ajout de l'action
@@ -280,9 +360,165 @@
 
             // Exécution de la fonction au chargement
             fetchUserInfo();
-            // Exemple d'appel AJAX (Fetch) pour récupérer les objets
-            // fetch('api/objets.php').then(res => res.json()).then(data => render(data));
+        
         });
+    </script> -->
+    <script>
+    $(document).ready(function () {
+        console.log("Interface prête. En attente des WebServices JSON...");
+
+        // ── 1. GESTION DE L'UTILISATEUR (Script 2) ─────────────────
+        function fetchUserInfo() {
+            $.ajax({
+                url: '../backend/process.php?action=get_user_info', 
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success && data.pseudo) {
+                        $('#userPseudo').text(data.pseudo);
+                        $('#userPseudoMobile').text(data.pseudo); // Si tu as un menu mobile
+                    } else {
+                        $('#userPseudo').text("Invité");
+                    }
+                },
+                error: function () {
+                    $('#userPseudo').text("Non connecté");
+                }
+            });
+        }
+        fetchUserInfo(); // Exécution au chargement
+
+        // ── 2. ANIMATIONS UI & DESIGN (Script 2) ───────────────────
+        // Apparition progressive des stats
+        $(".card-stats").each(function (index) {
+            $(this).delay(150 * index).animate({ opacity: 1, top: "0" }, 600);
+        });
+
+        // Apparition du reste du contenu
+        $("#treeview, #objectList").animate({ opacity: 1 }, 1000);
+
+        // Effet d'agrandissement de la barre de recherche
+        $("#searchName").on("focus", function () {
+            $(this).parent().animate({ width: "105%" }, 200);
+        }).on("blur", function () {
+            $(this).parent().animate({ width: "100%" }, 200);
+        });
+
+        // Menu accordéon (Navigation)
+        $(".ms-3.mt-2.small").hide();
+        $("#treeview .list-group-item").on("click", function (e) {
+            const subMenu = $(this).find(".ms-3");
+            if (subMenu.length > 0) {
+                subMenu.slideToggle(400, "swing");
+                $(this).find(".bi-building, .bi-house").toggleClass("text-primary");
+            }
+        });
+
+        // ── 3. CHARGEMENT DES STATS & CATÉGORIES (Script 1) ────────
+        $.ajax({
+            url: '../backend/get_stats.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $('#statTotal').text(data.total);
+                $('#statPret').text(data.pret);
+                $('#statMaintenance').text(data.maintenance);
+                $('#statDispo').text(data.disponible);
+            },
+            error: function () {
+                $('#statTotal, #statPret, #statMaintenance, #statDispo').text('-');
+            }
+        });
+
+        $.ajax({
+            url: '../backend/get_categories.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function (cats) {
+                cats.forEach(function (c) {
+                    $('#searchCategory').append(
+                        `<option value="${c.idCategorie}">${c.nom}</option>`
+                    );
+                });
+            }
+        });
+
+        // ── 4. RECHERCHE VRAIE LOGIQUE + ANIMATIONS (Mix des deux) ─
+        function doSearch() {
+            const nom = $('#searchName').val().trim();
+            const cat = $('#searchCategory').val();
+
+            if (!nom && !cat) {
+                $('#searchResults').hide();
+                // Effet de secousse si le champ est vide (pris du script 2)
+                $("#searchName").animate({ marginLeft: "-10px" }, 50)
+                              .animate({ marginLeft: "10px" }, 50)
+                              .animate({ marginLeft: "0px" }, 50);
+                return;
+            }
+
+            // Affichage du vrai loader (Script 1 & 2)
+            $('#btnSearch').html('<span class="spinner-border spinner-border-sm"></span>');
+
+            $.ajax({
+                url: '../backend/get_objets.php',
+                method: 'GET',
+                data: { nom: nom, cat: cat },
+                dataType: 'json',
+                success: function (objets) {
+                    // Remise de la loupe une fois la recherche finie
+                    $('#btnSearch').html('<i class="bi bi-search"></i>');
+
+                    if (objets.length === 0) {
+                        $('#searchResults').html('<div class="col"><p class="text-white text-center">Aucun objet trouvé.</p></div>').show();
+                        // Secousse si pas de résultat
+                        $("#searchName").animate({ marginLeft: "-10px" }, 50)
+                                      .animate({ marginLeft: "10px" }, 50)
+                                      .animate({ marginLeft: "0px" }, 50);
+                        return;
+                    }
+
+                    // Génération des cartes
+                    let html = '';
+                    objets.forEach(function (o) {
+                        const badgeClass = o.statut === 'Disponible' ? 'bg-success' :
+                                           o.statut.includes('Prêt') ? 'bg-warning text-dark' :
+                                           'bg-danger';
+                        html += `
+                        <div class="col">
+                            <div class="card h-100 product-card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title h6 mb-0">${o.nom}</h5>
+                                        <span class="badge ${badgeClass}">${o.statut}</span>
+                                    </div>
+                                    <p class="card-text text-muted small mb-1">
+                                        <i class="bi bi-tag me-1"></i>${o.categorie}
+                                    </p>
+                                    <p class="card-text text-primary small">
+                                        <i class="bi bi-geo-alt me-1"></i>
+                                        ${o.site_nom} › ${o.local_nom} › ${o.rangement_nom} › ${o.niveau_nom}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    $('#searchResults').html(html).show();
+                },
+                error: function() {
+                    $('#btnSearch').html('<i class="bi bi-search"></i>');
+                    $('#searchResults').html('<div class="col"><p class="text-danger text-center">Erreur lors de la recherche.</p></div>').show();
+                }
+            });
+        }
+
+        // Écouteurs pour lancer la recherche
+        $('#btnSearch').on('click', doSearch);
+        $('#searchName').on('keypress', function (e) {
+            if (e.which === 13) doSearch(); // Touche Entrée
+        });
+
+    });
     </script>
 </body>
 </html>

@@ -11,8 +11,6 @@ if (!$idUtilisateurConnecte) {
     echo json_encode(['error' => 'Vous devez être connecté']);
     exit;
 }
-// $action n'est jamais récupérée depuis la requête, ça va planter
-$action = $_REQUEST['action'] ?? '';
 // On récupère l'action à réaliser
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
