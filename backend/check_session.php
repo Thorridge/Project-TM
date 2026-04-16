@@ -1,5 +1,5 @@
 <?php
-// backend/check_session.php
+ini_set('session.cookie_path', '/');
 session_start();
 header('Content-Type: application/json');
 

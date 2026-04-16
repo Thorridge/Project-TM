@@ -6,7 +6,6 @@ require_once 'connect.php';
 
 $nom     = trim($_POST['nom']     ?? '');
 $prenom  = trim($_POST['prenom']  ?? '');
-$pseudo  = trim($_POST['pseudo']  ?? '');
 $login   = trim($_POST['login']   ?? '');
 $mdp     = trim($_POST['mdp']     ?? '');
 $mdpConf = trim($_POST['mdpConf'] ?? '');
@@ -36,14 +35,13 @@ if ($stmt->fetch()) {
 $mdpHash = password_hash($mdp, PASSWORD_DEFAULT);
 
 $stmt = $pdo->prepare("
-    INSERT INTO utilisateur (nomUtilisateur, prenomUtilisateur, pseudoUtilisateur, role, login, mdp)
-    VALUES (:nom, :prenom, :pseudo, 'user', :login, :mdp)
+    INSERT INTO utilisateur (nomUtilisateur, prenomUtilisateur, role, login, mdp)
+    VALUES (:nom, :prenom, 'user', :login, :mdp)
 ");
 
 $stmt->execute([
     'nom'    => $nom,
     'prenom' => $prenom,
-    'pseudo' => $pseudo, // Ajout ici
     'login'  => $login,
     'mdp'    => $mdpHash
 ]);

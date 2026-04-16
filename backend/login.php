@@ -1,4 +1,5 @@
 <?php
+ini_set('session.cookie_path', '/');
 // backend/login.php
 session_start();
 header('Content-Type: application/json');
