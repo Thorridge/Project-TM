@@ -14,7 +14,6 @@ $options = [
 ];
 
 try {
-    // CORRIGÉ : $password au lieu de $pass
     $pdo = new PDO($dsn, $user, $pass, $options); 
 } catch (\PDOException $e) {
     header('Content-Type: application/json');
