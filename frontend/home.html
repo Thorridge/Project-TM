@@ -200,6 +200,89 @@
         });
 
     });
+    // Logique AJAX simplifiée pour respecter la séparation Frontend/Backend
+        $(document).ready(function () {
+            console.log("Interface prête. En attente des WebServices JSON...");
+            // --- 1. Animation d'entrée progressive (Staggered FadeIn) ---
+            // On fait apparaître les cartes de stats l'une après l'autre
+            $(".card-stats").each(function (index) {
+                $(this).delay(150 * index).animate({
+                    opacity: 1,
+                    top: "0"
+                }, 600);
+            });
+
+            // Apparition du reste du contenu
+            $("#treeview, #objectList").animate({ opacity: 1 }, 1000);
+
+            // --- 2. Animation de la barre de recherche ---
+            $("#searchName").on("focus", function () {
+                $(this).parent().animate({
+                    width: "105%" // Petit effet d'agrandissement
+                }, 200);
+            }).on("blur", function () {
+                $(this).parent().animate({
+                    width: "100%"
+                }, 200);
+            });
+
+            // --- 3. Accordéon fluide pour la Navigation Géographique ---
+            // On cache d'abord les sous-niveaux (si tu en as d'autres)
+            $(".ms-3.mt-2.small").hide();
+
+            // Animation au clic sur un parent dans le treeview
+            $("#treeview .list-group-item").on("click", function (e) {
+                // Empêche le saut de page si c'est un lien
+                // e.preventDefault(); 
+
+                const subMenu = $(this).find(".ms-3");
+                if (subMenu.length > 0) {
+                    subMenu.slideToggle(400, "swing");
+                    // Rotation de l'icône si nécessaire
+                    $(this).find(".bi-building, .bi-house").toggleClass("text-primary");
+                }
+            });
+
+            // --- 4. Animation du bouton de recherche ---
+            $("#btnSearch").on("click", function () {
+                $(this).html('<span class="spinner-border spinner-border-sm"></span>');
+
+                // Simulation d'un chargement
+                setTimeout(() => {
+                    $(this).html('<i class="bi bi-search"></i>');
+                    // Animation de secousse si aucun résultat (exemple)
+                    if ($("#searchName").val() === "") {
+                        $("#searchName").animate({ marginLeft: "-10px" }, 50)
+                            .animate({ marginLeft: "10px" }, 50)
+                            .animate({ marginLeft: "0px" }, 50);
+                    }
+                }, 800);
+            });
+            function fetchUserInfo() {
+                $.ajax({
+                    // Correction du chemin et ajout de l'action
+                    url: '../backend/process.php?action=get_user_info', 
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success && data.pseudo) {
+                            $('#userPseudo').text(data.pseudo);
+                            $('#userPseudoMobile').text(data.pseudo);
+                        } else {
+                            $('#userPseudo').text("Invité");
+                        }
+                    },
+                    error: function () {
+                        $('#userPseudo').text("Non connecté");
+                    }
+                });
+            }
+
+            // Exécution de la fonction au chargement
+            fetchUserInfo();
+            // Exemple d'appel AJAX (Fetch) pour récupérer les objets
+            // fetch('api/objets.php').then(res => res.json()).then(data => render(data));
+        });
     </script>
 </body>
 </html>
