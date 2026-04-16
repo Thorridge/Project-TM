@@ -15,7 +15,7 @@ $options = [
 
 try {
     // CORRIGÉ : $password au lieu de $pass
-    $pdo = new PDO($dsn, $user, $pass, $options); 
+    $pdo = new PDO($dsn, $user, $password, $options); 
 } catch (\PDOException $e) {
     header('Content-Type: application/json');
     echo json_encode(['success' => false, 'error' => "Erreur de connexion : " . $e->getMessage()]);
