@@ -119,94 +119,89 @@ body { background-color: #f8f9fa; }
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+$(document).ready(function () {
 
-// 🔹 Charger produits depuis API
-function loadProduits() {
-    fetch("api/produits.php")
-        .then(res => res.json())
-        .then(data => {
-            let options = '<option value="">Choisir un produit</option>';
-            data.forEach(p => {
-                options += `<option value="${p.id}">${p.nom}</option>`;
+    // 🔹 Date par défaut = aujourd'hui
+    $("#dateDebut").val(new Date().toISOString().split("T")[0]);
+
+    // 🔹 Charger produits disponibles
+    function loadProduits() {
+        fetch("../backend/get_produits_dispo.php")
+            .then(res => res.json())
+            .then(data => {
+                let options = '<option value="">Choisir un produit</option>';
+
+                data.forEach(p => {
+                    options += `<option value="${p.idObjet}">${p.nom}</option>`;
+                });
+
+                $("#produit").html(options);
             });
-            $("#produit").html(options);
-        });
-}
-
-// 🔹 Charger users depuis API
-function loadUsers() {
-    fetch("api/users.php")
-        .then(res => res.json())
-        .then(data => {
-            let options = '<option value="">Choisir un utilisateur</option>';
-            data.forEach(u => {
-                options += `<option value="${u.id}">${u.username}</option>`;
-            });
-            $("#user").html(options);
-        });
-}
-
-// 🔹 Envoi formulaire (API future)
-$("#loanForm").on("submit", function(e) {
-    e.preventDefault();
-
-    let data = {
-        produit_id: $("#produit").val(),
-        user_id: $("#user").val(),
-        date_debut: $("#dateDebut").val(),
-        date_fin: $("#dateFin").val()
-    };
-
-    // Validation simple
-    if (!data.produit_id || !data.user_id || !data.date_debut) {
-        $("#message").html("<span class='text-danger'>Champs obligatoires</span>");
-        return;
     }
 
-    $("#message").html("<span class='text-info'>Envoi en cours...</span>");
+    // 🔹 Charger utilisateurs
+    function loadUsers() {
+        fetch("../backend/get_users.php")
+            .then(res => res.json())
+            .then(data => {
+                let options = '<option value="">Choisir un utilisateur</option>';
 
-    fetch("api/add_loan.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(response => {
-        $("#message").html("<span class='text-success'>Prêt ajouté</span>");
-    })
-    .catch(() => {
-        $("#message").html("<span class='text-danger'>Erreur</span>");
-    });
-});
+                data.forEach(u => {
+                    options += `<option value="${u.idUtilisateur}">${u.pseudoUtilisateur}</option>`;
+                });
 
-// 🔹 USER INFO
-function fetchUserInfo() {
-    $.ajax({
-        url: 'api/get_user_info.php',
-        method: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            if (data.pseudo) {
-                $('#userPseudo').text(data.pseudo);
-                $('#userPseudoMobile').text(data.pseudo);
-            }
-        },
-        error: function () {
-            $('#userPseudo').text("Invité");
-            $('#userPseudoMobile').text("Invité");
+                $("#user").html(options);
+            });
+    }
+
+    // 🔹 Submit
+    $("#loanForm").on("submit", function(e) {
+        e.preventDefault();
+
+        let data = {
+            produit_id: $("#produit").val(),
+            user_id: $("#user").val(),
+            date_debut: $("#dateDebut").val(),
+            date_fin: $("#dateFin").val()
+        };
+
+        if (!data.produit_id || !data.user_id || !data.date_debut) {
+            $("#message").html("<span class='text-danger'>Champs obligatoires</span>");
+            return;
         }
-    });
-}
 
-// Init
-$(document).ready(function () {
-    fetchUserInfo();
+        $("#message").html("<span class='text-info'>Envoi...</span>");
+
+        fetch("../backend/add_pret.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(response => {
+
+            if (response.success) {
+                $("#message").html("<span class='text-success'>Prêt ajouté</span>");
+                $("#loanForm")[0].reset();
+                $("#dateDebut").val(new Date().toISOString().split("T")[0]);
+                loadProduits();
+            } else {
+                $("#message").html("<span class='text-danger'>" + response.message + "</span>");
+            }
+
+        })
+        .catch(() => {
+            $("#message").html("<span class='text-danger'>Erreur serveur</span>");
+        });
+    });
+
+
+    // INIT
     loadProduits();
     loadUsers();
 });
-
 </script>
 
 </body>
