@@ -25,11 +25,11 @@ if (!$user || !password_verify($mdp, $user['mdp'])) {
 $_SESSION['user_id']    = $user['idUtilisateur'];
 $_SESSION['user_login'] = $user['login'];
 $_SESSION['user_role']  = $user['role'];
-$_SESSION['user_nom']   = $user['nomUtilisateur'];
+$_SESSION['user_nom'] = $user['prenomUtilisateur'];
 
 echo json_encode([
     'success' => true,
     'role'    => $user['role'],
-    'nom'     => $user['nomUtilisateur']
+    'nom'     => $user['prenomUtilisateur']
 ]);
 ?>

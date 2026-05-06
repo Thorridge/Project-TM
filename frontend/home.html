@@ -16,7 +16,7 @@
             <a class="navbar-brand" href="home.html"><i class="bi bi-cpu"></i> HardwarePark</a>
 
             <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
-                Connecté en tant que : <span id="userPseudo" class="text-white fw-bold">...</span>
+                Connecté en tant que : <span id="userNom" class="text-white fw-bold">...</span>
             </div>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -27,8 +27,8 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link active" href="home.html">Accueil</a></li>
                     <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
-                    <li class="nav-item"><a class="nav-link" href="prets.html">Mes Prêts</a></li>
-                    <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Mes Prêts</a></li>
+                    <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="#" onclick="logout(); return false;">Déconnexion</a></li>
                 </ul>
             </div>
         </div>
@@ -106,59 +106,14 @@
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     $(document).ready(function () {
-        console.log("Interface prête. En attente des WebServices JSON...");
+        checkSession();
 
-        // ── 1. GESTION DE L'UTILISATEUR (Script 2) ─────────────────
-        function fetchUserInfo() {
-            $.ajax({
-                url: '../backend/process.php?action=get_user_info', 
-                method: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.success && data.pseudo) {
-                        $('#userPseudo').text(data.pseudo);
-                        $('#userPseudoMobile').text(data.pseudo); // Si tu as un menu mobile
-                    } else {
-                        $('#userPseudo').text("Invité");
-                    }
-                },
-                error: function () {
-                    $('#userPseudo').text("Non connecté");
-                }
-            });
-        }
-        fetchUserInfo(); // Exécution au chargement
 
-        // ── 2. ANIMATIONS UI & DESIGN (Script 2) ───────────────────
-        // Apparition progressive des stats
-        $(".card-stats").each(function (index) {
-            $(this).delay(150 * index).animate({ opacity: 1, top: "0" }, 600);
-        });
-
-        // Apparition du reste du contenu
-        $("#treeview, #objectList").animate({ opacity: 1 }, 1000);
-
-        // Effet d'agrandissement de la barre de recherche
-        $("#searchName").on("focus", function () {
-            $(this).parent().animate({ width: "105%" }, 200);
-        }).on("blur", function () {
-            $(this).parent().animate({ width: "100%" }, 200);
-        });
-
-        // Menu accordéon (Navigation)
-        $(".ms-3.mt-2.small").hide();
-        $("#treeview .list-group-item").on("click", function (e) {
-            const subMenu = $(this).find(".ms-3");
-            if (subMenu.length > 0) {
-                subMenu.slideToggle(400, "swing");
-                $(this).find(".bi-building, .bi-house").toggleClass("text-primary");
-            }
-        });
-
-        // ── 3. CHARGEMENT DES STATS & CATÉGORIES (Script 1) ────────
+        // ── 1. Charger les stats ───────────────────────────────────
         $.ajax({
             url: '../backend/get_stats.php',
             method: 'GET',
@@ -174,6 +129,7 @@
             }
         });
 
+        // ── 2. Charger les catégories ──────────────────────────────
         $.ajax({
             url: '../backend/get_categories.php',
             method: 'GET',
@@ -187,21 +143,16 @@
             }
         });
 
-        // ── 4. RECHERCHE VRAIE LOGIQUE + ANIMATIONS (Mix des deux) ─
+        // ── 3. Recherche depuis home ───────────────────────────────
         function doSearch() {
             const nom = $('#searchName').val().trim();
             const cat = $('#searchCategory').val();
 
             if (!nom && !cat) {
                 $('#searchResults').hide();
-                // Effet de secousse si le champ est vide (pris du script 2)
-                $("#searchName").animate({ marginLeft: "-10px" }, 50)
-                              .animate({ marginLeft: "10px" }, 50)
-                              .animate({ marginLeft: "0px" }, 50);
                 return;
             }
 
-            // Affichage du vrai loader (Script 1 & 2)
             $('#btnSearch').html('<span class="spinner-border spinner-border-sm"></span>');
 
             $.ajax({
@@ -210,24 +161,18 @@
                 data: { nom: nom, cat: cat },
                 dataType: 'json',
                 success: function (objets) {
-                    // Remise de la loupe une fois la recherche finie
                     $('#btnSearch').html('<i class="bi bi-search"></i>');
 
                     if (objets.length === 0) {
                         $('#searchResults').html('<div class="col"><p class="text-white text-center">Aucun objet trouvé.</p></div>').show();
-                        // Secousse si pas de résultat
-                        $("#searchName").animate({ marginLeft: "-10px" }, 50)
-                                      .animate({ marginLeft: "10px" }, 50)
-                                      .animate({ marginLeft: "0px" }, 50);
                         return;
                     }
 
-                    // Génération des cartes
                     let html = '';
                     objets.forEach(function (o) {
                         const badgeClass = o.statut === 'Disponible' ? 'bg-success' :
                                            o.statut.includes('Prêt') ? 'bg-warning text-dark' :
-                                           'bg-danger';
+                                                                        'bg-danger';
                         html += `
                         <div class="col">
                             <div class="card h-100 product-card shadow-sm">
@@ -248,18 +193,13 @@
                         </div>`;
                     });
                     $('#searchResults').html(html).show();
-                },
-                error: function() {
-                    $('#btnSearch').html('<i class="bi bi-search"></i>');
-                    $('#searchResults').html('<div class="col"><p class="text-danger text-center">Erreur lors de la recherche.</p></div>').show();
                 }
             });
         }
 
-        // Écouteurs pour lancer la recherche
         $('#btnSearch').on('click', doSearch);
         $('#searchName').on('keypress', function (e) {
-            if (e.which === 13) doSearch(); // Touche Entrée
+            if (e.which === 13) doSearch();
         });
 
     });
