@@ -1,6 +1,6 @@
 /* home.html */
 body { 
-    background-image: url("roar.webp"); 
+    background-color: #f8f9fa; 
 }
 .hero-section { 
     background: #212529; color: white; padding: 2rem 0; 
@@ -38,4 +38,80 @@ body {
 .form-control:focus {
     box-shadow: none;
     border-color: #0d6efd;
+}
+
+#objectList {
+    opacity: 1 !important;
+}
+.card-stats {
+    opacity: 1;
+}
+/* Effet de zoom au survol des cartes stats */
+.card-stats {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-stats:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Appliquer une transition sur les conteneurs principaux et les colonnes */
+.container, .row, [class*="col-"] {
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Optionnel : Empêcher le débordement horizontal pendant l'animation */
+body {
+    overflow-x: hidden;
+}
+
+
+
+/* addproduct.html */
+body {
+    background-color: #f8f9fa;
+}
+.form-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.form-header {
+    background-color: #212529;
+    color: #fff;
+    padding: 1rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+/* produits.html */
+body {
+    background-color: #f8f9fa;
+}
+.product-card {
+    border-radius: 12px;
+    transition: 0.2s;
+}
+.product-card:hover {
+    transform: translateY(-3px);
+}
+/* inscription.html */
+body {
+    background-color: #f8f9fa;
+}
+.register-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 1rem;
+}
+.register-header {
+    background-color: #212529;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
