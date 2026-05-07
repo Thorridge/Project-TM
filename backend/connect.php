@@ -3,9 +3,9 @@
 
 // Paramètres de connexion (à modifier selon votre hébergeur)
 $host = 'localhost';
-$dbname = 'votre_nom_de_bd';
-$user = 'votre_utilisateur';
-$password = 'votre_mot_de_pas_se';
+$dbname = 'bd.sql';
+$user = $config['username'];                    //Le nom d'utilisateur
+$password = $config['password'];                //Le mot de passe de l'utilisateur
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
