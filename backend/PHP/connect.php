@@ -1,6 +1,6 @@
 <?php
 $host     = 'localhost';
-$dbname   = 'hardware_db'; // CORRIGÉ : correspond au nom dans bd.sql
+$dbname   = 'hardware_db'; 
 $user     = 'root';
 $password = '';
 $charset  = 'utf8mb4';
@@ -14,7 +14,6 @@ $options = [
 ];
 
 try {
-    // CORRIGÉ : $password au lieu de $pass
     $pdo = new PDO($dsn, $user, $password, $options); 
 } catch (\PDOException $e) {
     header('Content-Type: application/json');
