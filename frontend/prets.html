@@ -1,167 +1,213 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HardwarePark | Mes Prêts</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardware Manager | Gestion des prêts</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+body { background-color: #f8f9fa; }
+.loan-card { border-radius: 12px; }
+</style>
 </head>
 
 <body class="d-flex flex-column min-vh-100">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="home.html"><i class="bi bi-cpu"></i> HardwarePark</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">
+            <i class="bi bi-cpu"></i> HardwarePark
+        </a>
+
+        <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
+            Connecté en tant que : <span id="userPseudo" class="text-white fw-bold">Chargement...</span>
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item d-lg-none">
+                    <span class="nav-link disabled text-info">
+                        Utilisateur : <b id="userPseudoMobile">...</b>
+                    </span>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="home.html">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Mes Prêts</a></li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENU -->
+<div class="container my-4">
+
+    <h4 class="mb-3">Gestion des prêts</h4>
+
+    <!-- FILTRES -->
+    <div class="row mb-3 align-items-end">
+
+        <div class="col-md-4 mb-2">
+            <input type="text" id="searchUser" class="form-control" placeholder="Rechercher utilisateur...">
+        </div>
+
+        <div class="col-md-3 mb-2">
+            <select id="filterStatus" class="form-select">
+                <option value="">Tous les états</option>
+                <option value="en_cours">En cours</option>
+                <option value="termine">Terminé</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 mb-2">
+            <button class="btn btn-primary w-100 h-100 d-flex justify-content-center align-items-center" id="btnSearch">
+                <i class="bi bi-search me-1"></i> Rechercher
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="home.html">Accueil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="prets.html">Mes Prêts</a></li>
-                    <li class="nav-item"><a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container my-4">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h4 mb-0"><i class="bi bi-arrow-left-right me-2"></i>Gestion des Prêts</h2>
         </div>
 
-        <!-- TABLEAU DES PRÊTS -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <i class="bi bi-list-check me-2"></i> Prêts en cours
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Objet</th>
-                                <th>Catégorie</th>
-                                <th>Emprunté par</th>
-                                <th>Date début</th>
-                                <th>Retour prévu</th>
-                                <th>Statut</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pretsList">
-                            <tr>
-                                <td colspan="7" class="text-center py-4">
-                                    <div class="spinner-border text-primary"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="col-md-3 mb-2">
+            <a href="addpret.html" class="btn btn-success w-100 h-100 d-flex justify-content-center align-items-center">
+                <i class="bi bi-plus-lg me-1"></i> Ajouter un prêt
+            </a>
         </div>
+    </div>
 
-    </main>
-
-    <footer class="bg-dark text-white py-4 mt-auto">
-        <div class="container text-center">
-            <small>&copy; 2026 - Projet Technologies Mobiles - Gestion de Parc Hardware</small>
+    <!-- LISTE -->
+    <div id="loanList" class="row">
+        <div class="text-center text-muted py-5">
+            Chargement des prêts...
         </div>
-    </footer>
+    </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    $(document).ready(function () {
+</div>
 
-        function loadPrets() {
-            $.ajax({
-                url: '../backend/get_prets.php',
-                method: 'GET',
-                dataType: 'json',
-                success: function (prets) {
-                    if (prets.length === 0) {
-                        $('#pretsList').html('<tr><td colspan="7" class="text-center text-muted py-4">Aucun prêt en cours.</td></tr>');
-                        return;
-                    }
+<!-- FOOTER -->
+<footer class="bg-dark text-white py-4 mt-auto">
+    <div class="container text-center">
+        <small>&copy; 2026 - Projet Technologies Mobiles - Gestion de Parc Hardware</small>
+    </div>
+</footer>
 
-                    let html = '';
-                    prets.forEach(function (p) {
-                        const dateDebut  = new Date(p.date_debut).toLocaleDateString('fr-FR');
-                        const dateRetour = p.date_retour_prevue ? new Date(p.date_retour_prevue).toLocaleDateString('fr-FR') : '-';
-                        const retourne   = p.date_retour_reelle !== null;
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-                        // Vérifier si en retard
-                        const today = new Date();
-                        const prevue = new Date(p.date_retour_prevue);
-                        const enRetard = !retourne && prevue < today;
+<script>
 
-                        const statutBadge = retourne
-                            ? `<span class="badge bg-success">Retourné</span>`
-                            : enRetard
-                                ? `<span class="badge bg-danger">En retard</span>`
-                                : `<span class="badge bg-warning text-dark">En cours</span>`;
+// 🔹 Badge statut
+function getStatusBadge(statut) {
+    if (statut === "en_cours") return `<span class="badge bg-warning text-dark">En cours</span>`;
+    if (statut === "termine") return `<span class="badge bg-success">Terminé</span>`;
+    return `<span class="badge bg-secondary">Inconnu</span>`;
+}
 
-                        const actionBtn = retourne
-                            ? `<span class="text-muted small">-</span>`
-                            : `<button class="btn btn-sm btn-outline-success btn-retour" data-id="${p.idPret}">
-                                <i class="bi bi-check-circle me-1"></i>Retour
-                               </button>`;
+// 🔹 ACTION retour (fusion du 1er fichier)
+function retourPret(idPret, idObjet) {
 
-                        html += `
-                        <tr>
-                            <td>
-                                <strong>${p.objet_nom}</strong>
-                                <br><small class="text-muted">${p.site_nom} › ${p.local_nom}</small>
-                            </td>
-                            <td><span class="badge bg-secondary">${p.categorie}</span></td>
-                            <td>
-                                ${p.prenomUtilisateur} ${p.nomUtilisateur}
-                                <br><small class="text-muted">${p.login}</small>
-                            </td>
-                            <td>${dateDebut}</td>
-                            <td class="${enRetard ? 'text-danger fw-bold' : ''}">${dateRetour}</td>
-                            <td>${statutBadge}</td>
-                            <td>${actionBtn}</td>
-                        </tr>`;
-                    });
+    if (!confirm("Confirmer la réception ?")) return;
 
-                    $('#pretsList').html(html);
-                },
-                error: function () {
-                    $('#pretsList').html('<tr><td colspan="7" class="text-center text-danger py-4">Erreur lors du chargement.</td></tr>');
-                }
-            });
+    fetch("../backend/retour_pret.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idPret: idPret, idObjet: idObjet })
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            loadLoans(); 
+        } else {
+            alert(res.message);
+        }
+    });
+}
+
+// 🔹 Render
+function renderLoans(loans) {
+
+    let html = "";
+
+    loans.forEach(l => {
+
+        let btn = "";
+
+        if (l.statut === "en_cours") {
+            btn = `
+            <button class="btn btn-sm btn-success mt-2"
+                onclick="retourPret(${l.idPret}, ${l.idObjet})">
+                <i class="bi bi-box-arrow-in-down"></i>
+                Réceptionner
+            </button>`;
         }
 
-        // Chargement initial
-        loadPrets();
+        html += `
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card loan-card p-3 shadow-sm">
 
-        // Bouton retour
-        $(document).on('click', '.btn-retour', function () {
-            const idPret = $(this).data('id');
-            const btn = $(this);
+                <h6>${l.produit}</h6>
 
-            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+                <small class="text-muted">
+                    Utilisateur : ${l.user}
+                </small><br>
 
-            $.ajax({
-                url: '../backend/retour_pret.php',
-                method: 'POST',
-                data: { idPret: idPret },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        loadPrets(); // Recharger la liste
-                    }
-                }
-            });
-        });
+                <small class="text-muted">
+                    Date : ${l.date}
+                </small>
 
+                <div class="mt-2">
+                    ${getStatusBadge(l.statut)}
+                </div>
+
+                ${btn}
+
+            </div>
+        </div>
+        `;
     });
-    </script>
+
+    document.getElementById("loanList").innerHTML = html;
+}
+
+// 🔹 LOAD
+function loadLoans(params = "") {
+    console.log("Tentative de chargement avec :", params); // Debug 1
+
+    fetch("../backend/get_pret.php" + params)
+        .then(res => {
+            console.log("Statut réponse HTTP:", res.status); // Debug 2
+            return res.json();
+        })
+        .then(data => {
+            console.log("Données reçues du PHP :", data); // Debug 3
+            renderLoans(data);
+        })
+        .catch(err => {
+            console.error("Erreur Fetch :", err);
+            $("#loanList").html("<div class='text-danger text-center'>Erreur de chargement</div>");
+        });
+}
+
+// 🔹 SEARCH
+$("#btnSearch").on("click", function () {
+    let user = $("#searchUser").val();
+    let status = $("#filterStatus").val();
+    loadLoans(`?user=${user}&status=${status}`);
+});
+
+// INIT
+$(document).ready(function () {
+    loadLoans();
+});
+
+</script>
+
 </body>
 </html>
