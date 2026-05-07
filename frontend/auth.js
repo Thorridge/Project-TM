@@ -1,5 +1,4 @@
 // auth.js — Gestion de la sécurité des sessions
-// À inclure dans toutes les pages protégées
 
 function checkSession(onSuccess) {
     $.ajax({
@@ -7,25 +6,32 @@ function checkSession(onSuccess) {
         method: 'GET',
         dataType: 'json',
         success: function (data) {
+
             if (!data.connected) {
                 window.location.href = 'index.html';
                 return;
             }
-            // Afficher le nom de l'utilisateur si présent
+
+            // Affichage du nom
             if (data.user_nom) {
                 $('#userNom').text(data.user_nom);
                 $('#userNomMobile').text(data.user_nom);
             }
-            // Afficher/cacher éléments selon le rôle
-            if (data.user_role === 'user') {
-                $('.admin-only').hide();
-                $('.owner-only').hide();
-            } else if (data.user_role === 'owner') {
-                $('.admin-only').hide();
+
+            // 🔥 Normalisation du rôle
+            const role = (data.user_role || data.role || '').toLowerCase();
+            console.log('Rôle détecté :', role, data); // garde ça pour vérifier dans la console
+
+            // USER → ne voit PAS Dashboard ni Mes prêts
+            if (role === 'user') {
+                $('.nav-dashboard').hide();
+                $('.nav-loans').hide();
             }
-            // Callback optionnel
+
+            // ADMIN + OWNER → voient tout
+
             if (typeof onSuccess === 'function') {
-                onSuccess(data);
+                onSuccess({ ...data, role });
             }
         },
         error: function () {
@@ -34,7 +40,6 @@ function checkSession(onSuccess) {
     });
 }
 
-// Déconnexion
 function logout() {
     $.ajax({
         url: '../backend/logout.php',

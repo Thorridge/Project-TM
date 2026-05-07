@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <body>
 
 <nav class="navbar navbar-dark bg-dark">
@@ -176,6 +179,18 @@ $(document).ready(function () {
     });
 
 });
+</script>
+<script>
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            window.location.replace("index.html");
+        };
 </script>
 </body>
 </html>

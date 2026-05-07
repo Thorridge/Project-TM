@@ -11,7 +11,6 @@ try {
         ]
     );
 
-    // récupérer JSON
     $data = json_decode(file_get_contents("php://input"), true);
 
     $produit = $data['produit_id'] ?? null;
@@ -27,7 +26,7 @@ try {
         exit;
     }
 
-    // 🔒 vérifier si déjà en prêt
+    // Vérifier si déjà en prêt
     $check = $pdo->prepare("
         SELECT idPret FROM pret
         WHERE idObjet = ?
@@ -43,7 +42,7 @@ try {
         exit;
     }
 
-    // ✅ insertion
+    // Insertion
     $stmt = $pdo->prepare("
         INSERT INTO pret (idObjet, idEmprunteur, date_debut, date_retour_prevue)
         VALUES (?, ?, ?, ?)
@@ -56,21 +55,18 @@ try {
         $date_fin ?: null
     ]);
 
-    // ✅ mettre statut = "En prêt" (important)
+    // Mettre statut = 2 (En prêt)
     $pdo->prepare("
         UPDATE objet
-        SET idStatut = 2
+        SET idStatut = 3
         WHERE idObjet = ?
     ")->execute([$produit]);
 
-    echo json_encode([
-        "success" => true
-    ]);
+    echo json_encode(["success" => true]);
 
 } catch (Exception $e) {
-
     echo json_encode([
         "success" => false,
-        "message" => $e->getMessage() // 🔥 très important pour debug
+        "message" => $e->getMessage()
     ]);
 }

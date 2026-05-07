@@ -28,11 +28,6 @@ body { background-color: #f8f9fa; }
             <i class="bi bi-cpu"></i> HardwarePark
         </a>
 
-        <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
-            Connecté en tant que : 
-            <span id="userPseudo" class="text-white fw-bold">Chargement...</span>
-        </div>
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -46,7 +41,7 @@ body { background-color: #f8f9fa; }
                 </li>
                 <li class="nav-item"><a class="nav-link" href="home.html">Accueil</a></li>
                 <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
-                <li class="nav-item"><a class="nav-link active" href="loans.html">Mes Prêts</a></li>
+                <li class="nav-item"><a class="nav-link active" href="prets.html">Mes Prêts</a></li>
                 <li class="nav-item">
                     <a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a>
                 </li>
@@ -94,13 +89,19 @@ body { background-color: #f8f9fa; }
                 <input type="date" id="dateFin" class="form-control">
             </div>
 
-            <!-- Bouton -->
+            <!-- Bouton enregistrer -->
             <button type="submit" class="btn btn-primary w-100">
                 <i class="bi bi-check-circle"></i> Enregistrer le prêt
             </button>
 
             <!-- Message -->
             <div id="message" class="text-center mt-3"></div>
+
+            <!-- Bouton retour -->
+            <a href="prets.html" class="btn btn-secondary w-100 mb-2">
+                <i class="bi bi-arrow-left"></i> Retour aux prêts
+            </a>
+
 
         </form>
 
@@ -117,7 +118,18 @@ body { background-color: #f8f9fa; }
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="auth.js"></script>
+<script>
+checkSession(function(data) {
+    const role = (data.user_role || '').toLowerCase();
 
+    if (role === 'user') {
+        // Empêche l'affichage de la page
+        document.body.innerHTML = "";
+        window.location.href = "home.html";
+    }
+});
+</script>
 <script>
 $(document).ready(function () {
 
@@ -129,6 +141,13 @@ $(document).ready(function () {
         fetch("../backend/get_produits_dispo.php")
             .then(res => res.json())
             .then(data => {
+
+                if (!Array.isArray(data)) {
+                    console.error("Réponse invalide :", data);
+                    $("#produit").html('<option value="">Erreur chargement</option>');
+                    return;
+                }
+
                 let options = '<option value="">Choisir un produit</option>';
 
                 data.forEach(p => {
@@ -144,10 +163,18 @@ $(document).ready(function () {
         fetch("../backend/get_users.php")
             .then(res => res.json())
             .then(data => {
+
+                if (!Array.isArray(data)) {
+                    console.error("Réponse invalide :", data);
+                    $("#user").html('<option value="">Erreur chargement</option>');
+                    return;
+                }
+
                 let options = '<option value="">Choisir un utilisateur</option>';
 
                 data.forEach(u => {
-                    options += `<option value="${u.idUtilisateur}">${u.pseudoUtilisateur}</option>`;
+                    options += `<option value="${u.idUtilisateur}">${u.nomComplet}</option>`;
+
                 });
 
                 $("#user").html(options);
@@ -197,12 +224,10 @@ $(document).ready(function () {
         });
     });
 
-
     // INIT
     loadProduits();
     loadUsers();
 });
 </script>
-
 </body>
 </html>
