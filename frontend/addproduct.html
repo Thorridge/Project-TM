@@ -30,7 +30,7 @@
 
         <div class="card-body">
 
-            <!-- Message retour -->
+            <!-- Message retour global -->
             <div id="message" class="mb-3" style="display:none;"></div>
 
             <!-- Nom -->
@@ -47,7 +47,7 @@
                 </select>
             </div>
 
-            <!-- Emplacement (Niveau) -->
+            <!-- Emplacement -->
             <div class="mb-3">
                 <label class="form-label">Emplacement <span class="text-danger">*</span></label>
                 <select id="idNiveau" class="form-select">
@@ -75,11 +75,23 @@
                 <textarea id="infoPlus" class="form-control" rows="3" placeholder="Infos supplémentaires..."></textarea>
             </div>
 
-            <!-- Propriétaire (ID utilisateur) -->
+            <!-- Propriétaire -->
             <div class="mb-3">
                 <label class="form-label">ID Propriétaire <span class="text-danger">*</span></label>
                 <input type="number" id="FK_idUser" class="form-control" placeholder="Ex: 4" min="1">
                 <small class="text-muted">Entrez l'ID de l'utilisateur propriétaire</small>
+            </div>
+
+            <!-- Image -->
+            <div class="mb-3">
+                <label class="form-label">Photo de l'objet</label>
+                <input type="file" id="photo" class="form-control" accept="image/*">
+
+                <!-- Message erreur image -->
+                <small id="photoError" class="text-danger mt-1" style="display:none;"></small>
+
+                <!-- Preview -->
+                <img id="preview" src="" class="img-fluid mt-2" style="max-height: 200px; display:none; border-radius:6px;">
             </div>
 
             <!-- Boutons -->
@@ -99,12 +111,11 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="auth.js"></script>
+
 <script>
 checkSession(function(data) {
     const role = (data.user_role || '').toLowerCase();
-
     if (role === 'user') {
-        // Empêche l'affichage de la page
         document.body.innerHTML = "";
         window.location.href = "home.html";
     }
@@ -112,42 +123,61 @@ checkSession(function(data) {
 </script>
 
 <script>
-    
 $(document).ready(function () {
-        checkSession();
 
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 Mo
 
-    // Charger les catégories
+    // Preview image
+    $("#photo").on("change", function () {
+        $('#photoError').hide().text('');
+
+        const file = this.files[0];
+        if (!file) return;
+
+        if (file.size > MAX_FILE_SIZE) {
+            $('#photoError').text("L'image est trop lourde. Taille maximale : 2 Mo.").show();
+            $("#preview").hide();
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $("#preview").attr("src", e.target.result).show();
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Charger catégories
     $.ajax({
         url: '../backend/get_categories.php',
         method: 'GET',
         dataType: 'json',
         success: function (cats) {
-            cats.forEach(function (c) {
+            cats.forEach(c => {
                 $('#idCategorie').append(`<option value="${c.idCategorie}">${c.nom}</option>`);
             });
         }
     });
 
-    // Charger les niveaux (emplacements)
+    // Charger niveaux
     $.ajax({
         url: '../backend/get_niveaux.php',
         method: 'GET',
         dataType: 'json',
         success: function (niveaux) {
-            niveaux.forEach(function (n) {
+            niveaux.forEach(n => {
                 $('#idNiveau').append(`<option value="${n.idNiveau}">${n.label}</option>`);
             });
         }
     });
 
-    // Charger les statuts
+    // Charger statuts
     $.ajax({
         url: '../backend/get_statuts.php',
         method: 'GET',
         dataType: 'json',
         success: function (statuts) {
-            statuts.forEach(function (s) {
+            statuts.forEach(s => {
                 $('#idStatut').append(`<option value="${s.idStatut}">${s.libelle}</option>`);
             });
         }
@@ -155,6 +185,10 @@ $(document).ready(function () {
 
     // Ajouter l'objet
     $('#btnAdd').on('click', function () {
+
+        const msg = $('#message');
+        msg.hide();
+
         const nom           = $('#nom').val().trim();
         const idCategorie   = $('#idCategorie').val();
         const idNiveau      = $('#idNiveau').val();
@@ -162,42 +196,60 @@ $(document).ready(function () {
         const infoPlus      = $('#infoPlus').val().trim();
         const infoRangement = $('#infoRangement').val().trim();
         const FK_idUser     = $('#FK_idUser').val().trim();
-        const msg           = $('#message');
+        const photo         = $('#photo')[0].files[0];
 
-        // Validation
+        // Champs obligatoires
         if (!nom || !idCategorie || !idNiveau || !idStatut || !FK_idUser) {
-            msg.removeClass('alert-success').addClass('alert alert-danger')
+            msg.removeClass().addClass('alert alert-danger')
                .text('Veuillez remplir tous les champs obligatoires (*)').show();
             return;
         }
 
+        // Taille image
+        $('#photoError').hide().text('');
+        if (photo && photo.size > MAX_FILE_SIZE) {
+            $('#photoError').text("L'image est trop lourde. Taille maximale : 2 Mo.").show();
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("nom", nom);
+        formData.append("idCategorie", idCategorie);
+        formData.append("idNiveau", idNiveau);
+        formData.append("idStatut", idStatut);
+        formData.append("infoPlus", infoPlus);
+        formData.append("infoRangement", infoRangement);
+        formData.append("FK_idUser", FK_idUser);
+
+        if (photo) formData.append("photo", photo);
+
         $('#btnAdd').prop('disabled', true)
-                   .html('<span class="spinner-border spinner-border-sm"></span> Ajout...');
+                    .html('<span class="spinner-border spinner-border-sm"></span> Ajout...');
 
         $.ajax({
             url: '../backend/add_objet.php',
             method: 'POST',
-            data: { nom, idCategorie, idNiveau, idStatut, infoPlus, infoRangement, FK_idUser },
+            data: formData,
+            processData: false,
+            contentType: false,
             dataType: 'json',
             success: function (response) {
                 if (response.success) {
-                    msg.removeClass('alert-danger').addClass('alert alert-success')
+                    msg.removeClass().addClass('alert alert-success')
                        .text('Objet ajouté ! Redirection...').show();
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1500);
+                    setTimeout(() => window.location.href = 'dashboard.html', 1500);
                 } else {
-                    msg.removeClass('alert-success').addClass('alert alert-danger')
+                    msg.removeClass().addClass('alert alert-danger')
                        .text(response.message).show();
                     $('#btnAdd').prop('disabled', false)
-                               .html('<i class="bi bi-check-circle"></i> Ajouter');
+                                .html('<i class="bi bi-check-circle"></i> Ajouter');
                 }
             },
             error: function () {
-                msg.removeClass('alert-success').addClass('alert alert-danger')
+                msg.removeClass().addClass('alert alert-danger')
                    .text('Erreur serveur. Réessayez.').show();
                 $('#btnAdd').prop('disabled', false)
-                           .html('<i class="bi bi-check-circle"></i> Ajouter');
+                            .html('<i class="bi bi-check-circle"></i> Ajouter');
             }
         });
     });

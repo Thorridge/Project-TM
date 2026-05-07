@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+
 <body>
 
 <nav class="navbar navbar-dark bg-dark">
@@ -28,54 +30,79 @@
         </div>
         <div class="card-body">
 
-            <div id="message" class="mb-3" style="display:none;"></div>
+            <!-- FORMULAIRE CORRIGÉ -->
+            <form id="editForm" enctype="multipart/form-data">
 
-            <input type="hidden" id="idObjet">
+                <div id="message" class="mb-3" style="display:none;"></div>
 
-            <div class="mb-3">
-                <label class="form-label">Nom de l'objet <span class="text-danger">*</span></label>
-                <input type="text" id="nom" class="form-control">
-            </div>
+                <input type="hidden" id="idObjet" name="idObjet">
 
-            <div class="mb-3">
-                <label class="form-label">Catégorie <span class="text-danger">*</span></label>
-                <select id="idCategorie" class="form-select">
-                    <option value="">Choisir une catégorie</option>
-                </select>
-            </div>
+                <!-- Nom -->
+                <div class="mb-3">
+                    <label class="form-label">Nom de l'objet <span class="text-danger">*</span></label>
+                    <input type="text" id="nom" name="nom" class="form-control">
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Emplacement <span class="text-danger">*</span></label>
-                <select id="idNiveau" class="form-select">
-                    <option value="">Choisir un emplacement</option>
-                </select>
-            </div>
+                <!-- Catégorie -->
+                <div class="mb-3">
+                    <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+                    <select id="idCategorie" name="idCategorie" class="form-select">
+                        <option value="">Choisir une catégorie</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Statut <span class="text-danger">*</span></label>
-                <select id="idStatut" class="form-select">
-                    <option value="">Choisir un statut</option>
-                </select>
-            </div>
+                <!-- Emplacement -->
+                <div class="mb-3">
+                    <label class="form-label">Emplacement <span class="text-danger">*</span></label>
+                    <select id="idNiveau" name="idNiveau" class="form-select">
+                        <option value="">Choisir un emplacement</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Info rangement</label>
-                <input type="text" id="infoRangement" class="form-control">
-            </div>
+                <!-- Statut -->
+                <div class="mb-3">
+                    <label class="form-label">Statut <span class="text-danger">*</span></label>
+                    <select id="idStatut" name="idStatut" class="form-select">
+                        <option value="">Choisir un statut</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <textarea id="infoPlus" class="form-control" rows="3"></textarea>
-            </div>
+                <!-- Info rangement -->
+                <div class="mb-3">
+                    <label class="form-label">Info rangement</label>
+                    <input type="text" id="infoRangement" name="infoRangement" class="form-control">
+                </div>
 
-            <div class="d-flex justify-content-between">
-                <a href="dashboard.html" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Retour
-                </a>
-                <button id="btnEdit" class="btn btn-warning">
-                    <i class="bi bi-save"></i> Enregistrer
-                </button>
-            </div>
+                <!-- Description -->
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea id="infoPlus" name="infoPlus" class="form-control" rows="3"></textarea>
+                </div>
+
+                <!-- Image actuelle -->
+                <div class="mb-3">
+                    <label class="form-label">Image actuelle</label>
+                    <div id="currentImage" class="mb-2"></div>
+                </div>
+
+                <!-- Nouvelle image -->
+                <div class="mb-3">
+                    <label class="form-label">Changer l'image</label>
+                    <input type="file" id="photo" name="photo" class="form-control" accept="image/*">
+                    <img id="preview" class="img-fluid mt-2" style="max-height:200px; display:none; border-radius:6px;">
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="dashboard.html" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                    <button id="btnEdit" type="button" class="btn btn-warning">
+                        <i class="bi bi-save"></i> Enregistrer
+                    </button>
+                </div>
+
+            </form>
+            <!-- FIN FORMULAIRE -->
 
         </div>
     </div>
@@ -83,6 +110,7 @@
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 $(document).ready(function () {
 
@@ -95,7 +123,17 @@ $(document).ready(function () {
         return;
     }
 
-    // Charger catégories, niveaux, statuts en parallèle
+    // Preview image
+    $("#photo").on("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = e => $("#preview").attr("src", e.target.result).show();
+        reader.readAsDataURL(file);
+    });
+
+    // Charger catégories, niveaux, statuts + objet
     $.when(
         $.ajax({ url: '../backend/get_categories.php', dataType: 'json' }),
         $.ajax({ url: '../backend/get_niveaux.php', dataType: 'json' }),
@@ -104,21 +142,15 @@ $(document).ready(function () {
     ).done(function (cats, niveaux, statuts, objet) {
 
         // Remplir catégories
-        cats[0].forEach(function (c) {
-            $('#idCategorie').append(`<option value="${c.idCategorie}">${c.nom}</option>`);
-        });
+        cats[0].forEach(c => $('#idCategorie').append(`<option value="${c.idCategorie}">${c.nom}</option>`));
 
         // Remplir niveaux
-        niveaux[0].forEach(function (n) {
-            $('#idNiveau').append(`<option value="${n.idNiveau}">${n.label}</option>`);
-        });
+        niveaux[0].forEach(n => $('#idNiveau').append(`<option value="${n.idNiveau}">${n.label}</option>`));
 
         // Remplir statuts
-        statuts[0].forEach(function (s) {
-            $('#idStatut').append(`<option value="${s.idStatut}">${s.libelle}</option>`);
-        });
+        statuts[0].forEach(s => $('#idStatut').append(`<option value="${s.idStatut}">${s.libelle}</option>`));
 
-        // Remplir le formulaire avec les données actuelles
+        // Remplir le formulaire
         const o = objet[0];
         $('#idObjet').val(o.idObjet);
         $('#nom').val(o.nom);
@@ -127,35 +159,33 @@ $(document).ready(function () {
         $('#idStatut').val(o.idStatut);
         $('#infoRangement').val(o.infoRangement);
         $('#infoPlus').val(o.infoPlus);
+
+        // Afficher l'image actuelle
+        if (o.photo) {
+            $('#currentImage').html(`
+                <img src="../backend/uploads/objets/${o.photo}" 
+                     class="img-fluid" style="max-height:200px; object-fit:contain;">
+            `);
+        } else {
+            $('#currentImage').html(`<p class="text-muted">Aucune image</p>`);
+        }
     });
 
     // Enregistrer les modifications
     $('#btnEdit').on('click', function () {
         const msg = $('#message');
 
-        const data = {
-            idObjet:       $('#idObjet').val(),
-            nom:           $('#nom').val().trim(),
-            idCategorie:   $('#idCategorie').val(),
-            idNiveau:      $('#idNiveau').val(),
-            idStatut:      $('#idStatut').val(),
-            infoRangement: $('#infoRangement').val().trim(),
-            infoPlus:      $('#infoPlus').val().trim()
-        };
-
-        if (!data.nom || !data.idCategorie || !data.idNiveau || !data.idStatut) {
-            msg.removeClass('alert-success').addClass('alert alert-danger')
-               .text('Veuillez remplir tous les champs obligatoires.').show();
-            return;
-        }
+        const formData = new FormData(document.getElementById("editForm"));
 
         $('#btnEdit').prop('disabled', true)
-                    .html('<span class="spinner-border spinner-border-sm"></span> Enregistrement...');
+                     .html('<span class="spinner-border spinner-border-sm"></span> Enregistrement...');
 
         $.ajax({
             url: '../backend/edit_objet.php',
             method: 'POST',
-            data: data,
+            data: formData,
+            processData: false,
+            contentType: false,
             dataType: 'json',
             success: function (response) {
                 if (response.success) {
@@ -166,31 +196,26 @@ $(document).ready(function () {
                     msg.removeClass('alert-success').addClass('alert alert-danger')
                        .text(response.message).show();
                     $('#btnEdit').prop('disabled', false)
-                                .html('<i class="bi bi-save"></i> Enregistrer');
+                                 .html('<i class="bi bi-save"></i> Enregistrer');
                 }
             },
             error: function () {
                 msg.removeClass('alert-success').addClass('alert alert-danger')
                    .text('Erreur serveur.').show();
                 $('#btnEdit').prop('disabled', false)
-                            .html('<i class="bi bi-save"></i> Enregistrer');
+                             .html('<i class="bi bi-save"></i> Enregistrer');
             }
         });
     });
 
 });
 </script>
-<script>
-        window.addEventListener('pageshow', function (event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
 
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function () {
-            window.location.replace("index.html");
-        };
+<script>
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) window.location.reload();
+});
 </script>
+
 </body>
 </html>
