@@ -37,9 +37,6 @@ body { background-color: #f8f9fa; }
                 <li class="nav-item"><a class="nav-link" href="home.html">Accueil</a></li>
                 <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
                 <li class="nav-item"><a class="nav-link active" href="#">Mes Prêts</a></li>
-                <li class="nav-item">
-                    <a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a>
-                </li>
             </ul>
         </div>
     </div>
@@ -214,18 +211,6 @@ $(document).ready(function () {
     loadLoans();
 });
 
-</script>
-<script>
-        window.addEventListener('pageshow', function (event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
-
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function () {
-            window.location.replace("index.html");
-        };
 </script>
 </body>
 </html>
