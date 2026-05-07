@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardware Manager | Nouveau prêt</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="style.css">
+
+<style>
+body { background-color: #f8f9fa; }
+.form-card {
+    max-width: 500px;
+    margin: auto;
+    border-radius: 12px;
+}
+</style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">
+            <i class="bi bi-cpu"></i> HardwarePark
+        </a>
+
+        <div class="navbar-text mx-auto text-white-50 d-none d-lg-block">
+            Connecté en tant que : 
+            <span id="userPseudo" class="text-white fw-bold">Chargement...</span>
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item d-lg-none">
+                    <span class="nav-link disabled text-info">
+                        Utilisateur : <b id="userPseudoMobile">...</b>
+                    </span>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="home.html">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Tableau de bord</a></li>
+                <li class="nav-item"><a class="nav-link active" href="loans.html">Mes Prêts</a></li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-light ms-lg-2" href="index.html">Déconnexion</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- FORMULAIRE -->
+<div class="container my-5">
+
+    <div class="card form-card shadow-sm p-4">
+
+        <h5 class="mb-3 text-center">
+            <i class="bi bi-arrow-left-right"></i> Nouveau prêt
+        </h5>
+
+        <form id="loanForm">
+
+            <!-- Produit -->
+            <div class="mb-3">
+                <label class="form-label">Produit</label>
+                <select id="produit" class="form-select">
+                    <option value="">Chargement...</option>
+                </select>
+            </div>
+
+            <!-- Utilisateur -->
+            <div class="mb-3">
+                <label class="form-label">Utilisateur</label>
+                <select id="user" class="form-select">
+                    <option value="">Chargement...</option>
+                </select>
+            </div>
+
+            <!-- Date début -->
+            <div class="mb-3">
+                <label class="form-label">Date de début</label>
+                <input type="date" id="dateDebut" class="form-control">
+            </div>
+
+            <!-- Date fin -->
+            <div class="mb-3">
+                <label class="form-label">Date de fin (optionnel)</label>
+                <input type="date" id="dateFin" class="form-control">
+            </div>
+
+            <!-- Bouton -->
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-check-circle"></i> Enregistrer le prêt
+            </button>
+
+            <!-- Message -->
+            <div id="message" class="text-center mt-3"></div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-dark text-white py-4 mt-auto">
+    <div class="container text-center">
+        <small>&copy; 2026 - Projet Technologies Mobiles</small>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function () {
+
+    // 🔹 Date par défaut = aujourd'hui
+    $("#dateDebut").val(new Date().toISOString().split("T")[0]);
+
+    // 🔹 Charger produits disponibles
+    function loadProduits() {
+        fetch("../backend/get_produits_dispo.php")
+            .then(res => res.json())
+            .then(data => {
+                let options = '<option value="">Choisir un produit</option>';
+
+                data.forEach(p => {
+                    options += `<option value="${p.idObjet}">${p.nom}</option>`;
+                });
+
+                $("#produit").html(options);
+            });
+    }
+
+    // 🔹 Charger utilisateurs
+    function loadUsers() {
+        fetch("../backend/get_users.php")
+            .then(res => res.json())
+            .then(data => {
+                let options = '<option value="">Choisir un utilisateur</option>';
+
+                data.forEach(u => {
+                    options += `<option value="${u.idUtilisateur}">${u.pseudoUtilisateur}</option>`;
+                });
+
+                $("#user").html(options);
+            });
+    }
+
+    // 🔹 Submit
+    $("#loanForm").on("submit", function(e) {
+        e.preventDefault();
+
+        let data = {
+            produit_id: $("#produit").val(),
+            user_id: $("#user").val(),
+            date_debut: $("#dateDebut").val(),
+            date_fin: $("#dateFin").val()
+        };
+
+        if (!data.produit_id || !data.user_id || !data.date_debut) {
+            $("#message").html("<span class='text-danger'>Champs obligatoires</span>");
+            return;
+        }
+
+        $("#message").html("<span class='text-info'>Envoi...</span>");
+
+        fetch("../backend/add_pret.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(response => {
+
+            if (response.success) {
+                $("#message").html("<span class='text-success'>Prêt ajouté</span>");
+                $("#loanForm")[0].reset();
+                $("#dateDebut").val(new Date().toISOString().split("T")[0]);
+                loadProduits();
+            } else {
+                $("#message").html("<span class='text-danger'>" + response.message + "</span>");
+            }
+
+        })
+        .catch(() => {
+            $("#message").html("<span class='text-danger'>Erreur serveur</span>");
+        });
+    });
+
+
+    // INIT
+    loadProduits();
+    loadUsers();
+});
+</script>
+
+</body>
+</html>
