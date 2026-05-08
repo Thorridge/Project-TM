@@ -3,7 +3,7 @@ ini_set('session.cookie_path', '/');
 session_start();
 header('Content-Type: application/json');
 
-// 🔥 Chemin corrigé
+// Chemin corrigé
 require_once __DIR__ . '/../../config/connect.php';
 
 $login = trim($_POST['login'] ?? '');
@@ -23,7 +23,7 @@ if (!$user || !password_verify($mdp, $user['mdp'])) {
     exit;
 }
 
-// 🔥 Correction : ta colonne s'appelle "role" dans la DB
+// Correction : ta colonne s'appelle "role" dans la DB
 $_SESSION['user_id']    = $user['idUtilisateur'];
 $_SESSION['user_login'] = $user['login'];
 $_SESSION['user_role']  = $user['role'];

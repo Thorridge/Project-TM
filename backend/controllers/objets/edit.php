@@ -66,7 +66,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
         exit;
     }
 
-    // 🔥 COMPRESSION DE L'IMAGE
+    // COMPRESSION DE L'IMAGE
     $info = getimagesize($destination);
     $mime = $info['mime'];
 

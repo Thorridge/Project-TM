@@ -3,7 +3,7 @@ ini_set('session.cookie_path', '/');
 session_start();
 header('Content-Type: application/json');
 
-// 🔥 Chemin corrigé
+// Chemin corrigé
 require_once __DIR__ . '/../../config/connect.php';
 
 if (!isset($_SESSION['user_id'])) {

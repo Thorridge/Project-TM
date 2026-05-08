@@ -56,7 +56,7 @@
 <script src="../assets/js/auth.js"></script>
 
 <script>
-// 🔹 Données simulées (à remplacer par API plus tard)
+//Données simulées (à remplacer par API plus tard)
 let products = [
     { nom: "Switch Cisco 24p", categorie: "Réseau", etat: "disponible" },
     { nom: "Serveur Dell R720", categorie: "Serveur", etat: "maintenance" },
@@ -65,14 +65,14 @@ let products = [
     { nom: "Routeur MikroTik", categorie: "Réseau", etat: "disponible" }
 ];
 
-// 🔹 Badge état
+//Badge état
 function getBadge(etat) {
     if (etat === "disponible") return `<span class="badge bg-success">Disponible</span>`;
     if (etat === "pret") return `<span class="badge bg-warning text-dark">En prêt</span>`;
     if (etat === "maintenance") return `<span class="badge bg-danger">Maintenance</span>`;
 }
 
-// 🔹 Affichage
+//Affichage
 function renderProducts(list) {
 
     let html = "";
@@ -109,7 +109,7 @@ function renderProducts(list) {
     document.getElementById("productList").innerHTML = html;
 }
 
-// 🔹 Recherche + filtre
+//Recherche + filtre
 function filterProducts() {
     let search = document.getElementById("searchInput").value.toLowerCase();
     let cat = document.getElementById("filterCategory").value;
@@ -124,7 +124,7 @@ function filterProducts() {
     renderProducts(filtered);
 }
 
-// 🔹 Events
+// Events
 document.getElementById("searchInput").addEventListener("input", filterProducts);
 document.getElementById("filterCategory").addEventListener("change", filterProducts);
 

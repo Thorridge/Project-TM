@@ -108,14 +108,14 @@ checkSession(function(data) {
 
 <script>
 
-// 🔹 Badge statut
+//Badge statut
 function getStatusBadge(statut) {
     if (statut === "en_cours") return `<span class="badge bg-warning text-dark">En cours</span>`;
     if (statut === "termine") return `<span class="badge bg-success">Terminé</span>`;
     return `<span class="badge bg-secondary">Inconnu</span>`;
 }
 
-// 🔹 ACTION retour
+//ACTION retour
 function retourPret(idPret, idObjet) {
 
     if (!confirm("Confirmer la réception ?")) return;
@@ -135,7 +135,7 @@ function retourPret(idPret, idObjet) {
     });
 }
 
-// 🔹 Render
+//Render
 function renderLoans(loans) {
 
     let html = "";
@@ -181,7 +181,7 @@ function renderLoans(loans) {
     document.getElementById("loanList").innerHTML = html;
 }
 
-// 🔹 LOAD
+//LOAD
 function loadLoans(params = "") {
 
     fetch("../../backend/controllers/prets/get.php" + params)
@@ -195,7 +195,7 @@ function loadLoans(params = "") {
         });
 }
 
-// 🔹 SEARCH
+//SEARCH
 $("#btnSearch").on("click", function () {
     let user = $("#searchUser").val();
     let status = $("#filterStatus").val();

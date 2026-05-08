@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-// 🔥 Chemin correct vers connect.php
+// Chemin correct vers connect.php
 require_once __DIR__ . '/../../config/connect.php';
 
 try {
