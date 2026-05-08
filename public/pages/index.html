@@ -2,47 +2,61 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HardwarePark | Connexion</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 
 <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card login-card">
-        <div class="login-header">
+    <div class="card login-card shadow-sm" style="max-width: 400px; width: 100%;">
+        
+        <div class="login-header text-center p-4 text-white bg-dark rounded-top">
             <h4><i class="bi bi-cpu"></i> HardwarePark</h4>
             <small>Gestion du matériel informatique</small>
         </div>
-        <div class="login-body">
+
+        <div class="card-body p-4">
             <div class="mb-3">
                 <label for="username" class="form-label">Login</label>
-                <input type="text" id="username" class="form-control" placeholder="Votre login">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" id="username" class="form-control" placeholder="Votre login">
+                </div>
             </div>
+
             <div class="mb-3">
                 <label for="password" class="form-label">Mot de passe</label>
-                <input type="password" id="password" class="form-control" placeholder="Votre mot de passe">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" id="password" class="form-control" placeholder="Votre mot de passe">
+                </div>
             </div>
 
-            <!-- Message d'erreur -->
-            <div id="loginMessage" class="mb-2 text-center small" style="display:none;"></div>
+            <div id="loginMessage" class="mb-3 text-center small" style="display:none;"></div>
 
-            <button id="btnLogin" class="btn btn-primary w-100 mb-2">
+            <button id="btnLogin" class="btn btn-primary w-100 mb-3">
                 <i class="bi bi-box-arrow-in-right"></i> Se connecter
             </button>
+
             <div class="text-center">
-                <a href="inscription.html" class="text-decoration-none">S'inscrire</a>
+                <small>Pas encore de compte ? 
+                    <a href="inscription.html" class="text-decoration-none">S'inscrire</a>
+                </small>
             </div>
         </div>
     </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 $(document).ready(function () {
-
+    // Votre code JS actuel reste identique et fonctionnel ici
     $('#btnLogin').on('click', function () {
-
         const login = $('#username').val().trim();
         const mdp   = $('#password').val().trim();
         const msg   = $('#loginMessage');
@@ -65,11 +79,7 @@ $(document).ready(function () {
                 if (response.success) {
                     msg.removeClass('text-danger').addClass('text-success')
                        .text('Connexion réussie ! Redirection...').show();
-
-                    setTimeout(() => {
-                        window.location.href = 'home.html';
-                    }, 800);
-
+                    setTimeout(() => { window.location.href = 'home.html'; }, 800);
                 } else {
                     msg.removeClass('text-success').addClass('text-danger')
                        .text(response.message).show();
@@ -89,9 +99,7 @@ $(document).ready(function () {
     $('#password').on('keypress', function (e) {
         if (e.which === 13) $('#btnLogin').click();
     });
-
 });
 </script>
-
 </body>
 </html>
