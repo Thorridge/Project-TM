@@ -13,18 +13,20 @@ try {
     );
 
     $sql = "
-    SELECT 
-        o.idObjet,
-        o.nom,
-        c.nom AS categorie
-    FROM objet o
-    JOIN categorie c ON o.idCategorie = c.idCategorie
-    LEFT JOIN pret p 
-        ON o.idObjet = p.idObjet
-        AND p.date_retour_reelle IS NULL
-    WHERE p.idPret IS NULL
-    ORDER BY o.nom ASC
-    ";
+        SELECT 
+            o.idObjet,
+            o.nom,
+            c.nom AS categorie
+        FROM objet o
+        JOIN categorie c ON o.idCategorie = c.idCategorie
+        LEFT JOIN pret p 
+            ON o.idObjet = p.idObjet
+            AND p.date_retour_reelle IS NULL
+        WHERE o.idStatut = 1
+        AND o.idStatut = 1
+        ORDER BY o.nom ASC
+        ";
+
 
     $stmt = $pdo->query($sql);
     echo json_encode($stmt->fetchAll());
