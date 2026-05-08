@@ -1,9 +1,9 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once __DIR__ . '/../config/connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'owner') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'owner') {
     echo json_encode(['success' => false, 'message' => 'Accès refusé.']);
     exit;
 }

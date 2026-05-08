@@ -98,9 +98,9 @@
 
         // Boutons Promote / Rétrograder
         $(document).on('click', '.btn-set-role', function () {
-            const id = $(this).data('id');
+            const idUtilisateur = $(this).data('id');
             const role = $(this).data('role');
-            updateRole(id, role);
+            updateRole(idUtilisateur, role);
         });
     });
 
@@ -177,7 +177,7 @@
     ─────────────────────────────────────────────── */
     function updateRole(idUtilisateur, role) {
 
-        $.post('../../backend/users/update_role.php',
+        $.post('../../backend/controllers/users/update_role.php',
         { idUtilisateur, role },
         function (res) {
 
