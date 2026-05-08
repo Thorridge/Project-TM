@@ -2,7 +2,7 @@
 // backend/get_stats.php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
 // Total objets
 $total = $pdo->query("SELECT COUNT(*) as total FROM objet")->fetch()['total'];

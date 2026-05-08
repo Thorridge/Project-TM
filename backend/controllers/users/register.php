@@ -2,7 +2,7 @@
 // backend/register.php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
 $nom     = trim($_POST['nom']     ?? '');
 $prenom  = trim($_POST['prenom']  ?? '');

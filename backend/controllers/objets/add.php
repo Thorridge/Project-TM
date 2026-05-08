@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
 // Récupérer les données POST
 $nom           = trim($_POST['nom']           ?? '');
@@ -25,7 +25,7 @@ $photoName = null;
 
 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
 
-    $uploadDir = __DIR__ . "/uploads/objets/";
+    $uploadDir = __DIR__ . "/../../uploads/objets/";
 
     // Créer le dossier si nécessaire
     if (!is_dir($uploadDir)) {

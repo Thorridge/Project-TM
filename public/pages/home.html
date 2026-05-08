@@ -6,7 +6,7 @@
     <title>Hardware Manager | Accueil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -131,8 +131,9 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../assets/js/auth.js"></script>
 
     <script>
     $(document).ready(function () {
@@ -140,7 +141,7 @@
 
         // ── 1. Charger les stats ───────────────────────────────────
         $.ajax({
-            url: '../backend/get_stats.php',
+            url: '../../backend/controllers/stats/get_stats.php',
             method: 'GET',
             dataType: 'json',
             success: function (data) {
@@ -156,7 +157,7 @@
 
         // ── 2. Charger les catégories ──────────────────────────────
         $.ajax({
-            url: '../backend/get_categories.php',
+            url: '../../backend/controllers/objets/get_categories.php',
             method: 'GET',
             dataType: 'json',
             success: function (cats) {
@@ -180,7 +181,7 @@
             $('#btnSearch').html('<span class="spinner-border spinner-border-sm"></span>');
 
             $.ajax({
-                url: '../backend/get_objets.php',
+                url: '../../backend/controllers/objets/get_all.php',
                 method: 'GET',
                 data: params,
                 dataType: 'json',
@@ -201,40 +202,41 @@
                                                         'bg-danger';
 
                         html += `
-                        <div class="col">
-                            <div class="card h-100 product-card shadow-sm">
+                            <div class="col">
+                                <div class="card h-100 product-card shadow-sm">
 
-                                <!-- IMAGE (version dashboard + clickable) -->
-                                <div class="text-center p-2 img-click"
-                                     data-img="${o.photo ? `../backend/uploads/objets/${o.photo}` : ''}"
-                                     style="height:160px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                                    <!-- IMAGE (version dashboard + clickable) -->
+                                    <div class="text-center p-2"
+                                        style="height:160px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
 
-                                    ${
-                                        o.photo
-                                        ? `<img src="../backend/uploads/objets/${o.photo}" 
-                                                 class="img-fluid"
-                                                 style="max-height:150px; object-fit:contain;">`
-                                        : `<i class="bi bi-image text-secondary" style="font-size:4rem;"></i>`
-                                    }
-                                </div>
-
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title h6 mb-0">${o.nom}</h5>
-                                        <span class="badge ${badgeClass}">${o.statut}</span>
+                                        ${
+                                            o.photo
+                                            ? `<img src="../../backend/uploads/objets/${o.photo}"
+                                                    class="img-fluid img-click"
+                                                    data-img="../../backend/uploads/objets/${o.photo}"
+                                                    style="max-height:150px; object-fit:contain;">`
+                                            : `<i class="bi bi-image text-secondary" style="font-size:4rem;"></i>`
+                                        }
                                     </div>
 
-                                    <p class="card-text text-muted small mb-1">
-                                        <i class="bi bi-tag me-1"></i>${o.categorie}
-                                    </p>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title h6 mb-0">${o.nom}</h5>
+                                            <span class="badge ${badgeClass}">${o.statut}</span>
+                                        </div>
 
-                                    <p class="card-text text-primary small">
-                                        <i class="bi bi-geo-alt me-1"></i>
-                                        ${o.site_nom} › ${o.local_nom} › ${o.rangement_nom} › ${o.niveau_nom}
-                                    </p>
+                                        <p class="card-text text-muted small mb-1">
+                                            <i class="bi bi-tag me-1"></i>${o.categorie}
+                                        </p>
+
+                                        <p class="card-text text-primary small">
+                                            <i class="bi bi-geo-alt me-1"></i>
+                                            ${o.site_nom} › ${o.local_nom} › ${o.rangement_nom} › ${o.niveau_nom}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>`;
+                            </div>`;
+
                     });
 
                     $('#searchResults').html(html).show();

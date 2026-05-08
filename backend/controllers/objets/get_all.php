@@ -1,8 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
-
+require_once __DIR__ . '/../../config/connect.php';
 $nom = "%" . ($_GET['nom'] ?? '') . "%";
 $cat = $_GET['cat'] ?? '';
 $local = $_GET['local'] ?? '';

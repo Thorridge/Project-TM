@@ -2,7 +2,7 @@
 
 function checkSession(onSuccess) {
     $.ajax({
-        url: '../backend/check_session.php',
+        url: '../../backend/controllers/users/check_session.php', // 🔥 Chemin corrigé
         method: 'GET',
         dataType: 'json',
         success: function (data) {
@@ -20,15 +20,13 @@ function checkSession(onSuccess) {
 
             // 🔥 Normalisation du rôle
             const role = (data.user_role || data.role || '').toLowerCase();
-            console.log('Rôle détecté :', role, data); // garde ça pour vérifier dans la console
+            console.log('Rôle détecté :', role, data);
 
             // USER → ne voit PAS Dashboard ni Mes prêts
             if (role === 'user') {
                 $('.nav-dashboard').hide();
                 $('.nav-loans').hide();
             }
-
-            // ADMIN + OWNER → voient tout
 
             if (typeof onSuccess === 'function') {
                 onSuccess({ ...data, role });
@@ -42,7 +40,7 @@ function checkSession(onSuccess) {
 
 function logout() {
     $.ajax({
-        url: '../backend/logout.php',
+        url: '../../backend/controllers/users/logout.php', // 🔥 Chemin corrigé
         method: 'POST',
         dataType: 'json',
         success: function () {
@@ -53,3 +51,5 @@ function logout() {
         }
     });
 }
+
+

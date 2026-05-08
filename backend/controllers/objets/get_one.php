@@ -2,7 +2,7 @@
 // backend/get_objet.php — récupère un seul objet par ID
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
 $id = intval($_GET['id'] ?? 0);
 

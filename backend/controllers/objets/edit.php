@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
 $idObjet       = intval($_POST['idObjet'] ?? 0);
 $nom           = trim($_POST['nom'] ?? '');
@@ -45,7 +45,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
     }
 
     // Si on arrive ici → l'image est bien uploadée
-    $uploadDir = __DIR__ . "/uploads/objets/";
+    $uploadDir = __DIR__ . "/../../uploads/objets/";
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
     $extension = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));

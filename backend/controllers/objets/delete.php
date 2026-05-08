@@ -1,8 +1,7 @@
 <?php
-// backend/delete_objet.php — supprime un objet
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
 $idObjet = intval($_POST['idObjet'] ?? 0);
 
@@ -28,7 +27,7 @@ $stmt->execute(['id' => $idObjet]);
 
 // 4. Supprimer l'image du dossier si elle existe
 if (!empty($photo)) {
-    $filePath = __DIR__ . "/uploads/objets/" . $photo;
+    $filePath = __DIR__ . "/../../uploads/objets/" . $photo;
 
     if (file_exists($filePath)) {
         unlink($filePath);
@@ -37,3 +36,4 @@ if (!empty($photo)) {
 
 echo json_encode(['success' => true, 'message' => 'Objet supprimé avec succès !']);
 ?>
+

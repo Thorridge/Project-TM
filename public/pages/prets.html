@@ -93,18 +93,19 @@ body { background-color: #f8f9fa; }
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="auth.js"></script>
+<script src="../assets/js/auth.js"></script>
+
 <script>
 checkSession(function(data) {
     const role = (data.user_role || '').toLowerCase();
 
     if (role === 'user') {
-        // Empêche l'affichage de la page
         document.body.innerHTML = "";
         window.location.href = "home.html";
     }
 });
 </script>
+
 <script>
 
 // 🔹 Badge statut
@@ -114,12 +115,12 @@ function getStatusBadge(statut) {
     return `<span class="badge bg-secondary">Inconnu</span>`;
 }
 
-// 🔹 ACTION retour (fusion du 1er fichier)
+// 🔹 ACTION retour
 function retourPret(idPret, idObjet) {
 
     if (!confirm("Confirmer la réception ?")) return;
 
-    fetch("../backend/retour_pret.php", {
+    fetch("../../backend/controllers/prets/retour.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idPret: idPret, idObjet: idObjet })
@@ -182,15 +183,10 @@ function renderLoans(loans) {
 
 // 🔹 LOAD
 function loadLoans(params = "") {
-    console.log("Tentative de chargement avec :", params); // Debug 1
 
-    fetch("../backend/get_pret.php" + params)
-        .then(res => {
-            console.log("Statut réponse HTTP:", res.status); // Debug 2
-            return res.json();
-        })
+    fetch("../../backend/controllers/prets/get.php" + params)
+        .then(res => res.json())
         .then(data => {
-            console.log("Données reçues du PHP :", data); // Debug 3
             renderLoans(data);
         })
         .catch(err => {

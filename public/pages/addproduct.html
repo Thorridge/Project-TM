@@ -6,7 +6,7 @@
     <title>Hardware Manager | Ajouter un objet</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 <body>
@@ -87,10 +87,8 @@
                 <label class="form-label">Photo de l'objet</label>
                 <input type="file" id="photo" class="form-control" accept="image/*">
 
-                <!-- Message erreur image -->
                 <small id="photoError" class="text-danger mt-1" style="display:none;"></small>
 
-                <!-- Preview -->
                 <img id="preview" src="" class="img-fluid mt-2" style="max-height: 200px; display:none; border-radius:6px;">
             </div>
 
@@ -110,7 +108,7 @@
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="auth.js"></script>
+<script src="../assets/js/auth.js"></script>
 
 <script>
 checkSession(function(data) {
@@ -149,7 +147,7 @@ $(document).ready(function () {
 
     // Charger catégories
     $.ajax({
-        url: '../backend/get_categories.php',
+        url: '../../backend/controllers/objets/get_categories.php',
         method: 'GET',
         dataType: 'json',
         success: function (cats) {
@@ -161,7 +159,7 @@ $(document).ready(function () {
 
     // Charger niveaux
     $.ajax({
-        url: '../backend/get_niveaux.php',
+        url: '../../backend/controllers/objets/get_niveaux.php',
         method: 'GET',
         dataType: 'json',
         success: function (niveaux) {
@@ -173,7 +171,7 @@ $(document).ready(function () {
 
     // Charger statuts
     $.ajax({
-        url: '../backend/get_statuts.php',
+        url: '../../backend/controllers/objets/get_statuts.php',
         method: 'GET',
         dataType: 'json',
         success: function (statuts) {
@@ -198,14 +196,12 @@ $(document).ready(function () {
         const FK_idUser     = $('#FK_idUser').val().trim();
         const photo         = $('#photo')[0].files[0];
 
-        // Champs obligatoires
         if (!nom || !idCategorie || !idNiveau || !idStatut || !FK_idUser) {
             msg.removeClass().addClass('alert alert-danger')
                .text('Veuillez remplir tous les champs obligatoires (*)').show();
             return;
         }
 
-        // Taille image
         $('#photoError').hide().text('');
         if (photo && photo.size > MAX_FILE_SIZE) {
             $('#photoError').text("L'image est trop lourde. Taille maximale : 2 Mo.").show();
@@ -227,7 +223,7 @@ $(document).ready(function () {
                     .html('<span class="spinner-border spinner-border-sm"></span> Ajout...');
 
         $.ajax({
-            url: '../backend/add_objet.php',
+            url: '../../backend/controllers/objets/add.php',
             method: 'POST',
             data: formData,
             processData: false,
@@ -259,3 +255,4 @@ $(document).ready(function () {
 
 </body>
 </html>
+

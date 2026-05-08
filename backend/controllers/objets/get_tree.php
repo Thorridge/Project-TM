@@ -2,7 +2,7 @@
 // backend/get_tree.php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+require_once __DIR__ . '/../../config/connect.php';
 
 // Récupérer toute l'arborescence Site > Local > Rangement
 $sql = "SELECT 

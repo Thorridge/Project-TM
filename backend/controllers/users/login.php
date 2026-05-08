@@ -1,9 +1,10 @@
 <?php
 ini_set('session.cookie_path', '/');
-// backend/login.php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
+
+// 🔥 Chemin corrigé
+require_once __DIR__ . '/../../config/connect.php';
 
 $login = trim($_POST['login'] ?? '');
 $mdp   = trim($_POST['mdp']   ?? '');
@@ -22,14 +23,14 @@ if (!$user || !password_verify($mdp, $user['mdp'])) {
     exit;
 }
 
+// 🔥 Correction : ta colonne s'appelle "role" dans la DB
 $_SESSION['user_id']    = $user['idUtilisateur'];
 $_SESSION['user_login'] = $user['login'];
 $_SESSION['user_role']  = $user['role'];
-$_SESSION['user_nom'] = $user['prenomUtilisateur'];
+$_SESSION['user_nom']   = $user['prenomUtilisateur'];
 
 echo json_encode([
     'success' => true,
     'role'    => $user['role'],
     'nom'     => $user['prenomUtilisateur']
 ]);
-?>

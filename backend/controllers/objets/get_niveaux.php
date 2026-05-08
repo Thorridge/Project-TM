@@ -2,8 +2,7 @@
 // backend/get_niveaux.php
 session_start();
 header('Content-Type: application/json');
-require_once 'connect.php';
-
+require_once __DIR__ . '/../../config/connect.php';
 $sql = "SELECT 
             n.idNiveau,
             CONCAT(s.nom, ' › ', l.nom, ' › ', r.nom, ' › ', n.nom) AS label
